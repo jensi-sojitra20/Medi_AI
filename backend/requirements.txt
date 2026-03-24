@@ -20,3 +20,5 @@ python-jose[cryptography]
 pytesseract
 Pillow
 httpx
+PyMuPDF
+
