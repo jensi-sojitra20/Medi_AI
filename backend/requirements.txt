@@ -21,4 +21,5 @@ pytesseract
 Pillow
 httpx
 PyMuPDF
+passlib[bcrypt]
 
