@@ -1,0 +1,191 @@
+/* Dashboard Theme Override - Apply #0099cc theme to all dashboards */
+
+/* Override purple colors with #0099cc */
+.bg-purple-600,
+.bg-purple-500,
+.bg-purple-700 {
+  background-color: #0099cc !important;
+}
+
+.text-purple-600,
+.text-purple-500,
+.text-purple-700 {
+  color: #0099cc !important;
+}
+
+.border-purple-600,
+.border-purple-500 {
+  border-color: #0099cc !important;
+}
+
+/* Override blue colors with #0099cc */
+.bg-blue-600,
+.bg-blue-500,
+.bg-blue-700 {
+  background-color: #0099cc !important;
+}
+
+.text-blue-600,
+.text-blue-500 {
+  color: #0099cc !important;
+}
+
+.border-blue-600,
+.border-blue-500 {
+  border-color: #0099cc !important;
+}
+
+/* Override green colors with #0099cc */
+.bg-green-600,
+.bg-green-500,
+.bg-green-700 {
+  background-color: #0099cc !important;
+}
+
+.text-green-600,
+.text-green-500 {
+  color: #0099cc !important;
+}
+
+.border-green-600,
+.border-green-500 {
+  border-color: #0099cc !important;
+}
+
+/* Hover states with #0099cc */
+.hover\:bg-purple-700:hover,
+.hover\:bg-blue-700:hover,
+.hover\:bg-green-700:hover {
+  background-color: #007799 !important;
+  /* Darker shade of #0099cc */
+}
+
+.hover\:text-purple-600:hover,
+.hover\:text-blue-600:hover,
+.hover\:text-green-600:hover {
+  color: #0099cc !important;
+}
+
+.hover\:border-purple-600:hover,
+.hover\:border-blue-600:hover {
+  border-color: #0099cc !important;
+}
+
+/* Light backgrounds with #0099cc tint */
+.bg-purple-50,
+.bg-blue-50,
+.bg-green-50 {
+  background-color: rgba(0, 153, 204, 0.05) !important;
+}
+
+.bg-purple-100,
+.bg-blue-100,
+.bg-green-100 {
+  background-color: rgba(0, 153, 204, 0.1) !important;
+}
+
+/* Ring colors */
+.ring-purple-500,
+.ring-blue-500 {
+  --tw-ring-color: #0099cc !important;
+}
+
+/* Focus states */
+.focus\:ring-purple-500:focus,
+.focus\:ring-blue-500:focus {
+  --tw-ring-color: #0099cc !important;
+}
+
+.focus\:border-purple-500:focus,
+.focus\:border-blue-500:focus {
+  border-color: #0099cc !important;
+}
+
+/* Accent color for active states */
+.bg-purple-600\/10,
+.bg-blue-600\/10 {
+  background-color: rgba(0, 153, 204, 0.1) !important;
+}
+
+/* Gradient overrides */
+.from-purple-600 {
+  --tw-gradient-from: #0099cc !important;
+}
+
+.to-purple-700,
+.to-blue-700 {
+  --tw-gradient-to: #007799 !important;
+}
+
+/* Special dashboard elements */
+.dashboard-primary-bg {
+  background-color: #0099cc;
+}
+
+.dashboard-primary-text {
+  color: #0099cc;
+}
+
+.dashboard-primary-border {
+  border-color: #0099cc;
+}
+
+/* Sidebar active state */
+.sidebar-active {
+  background-color: rgba(0, 153, 204, 0.1);
+  border-left: 3px solid #0099cc;
+  color: #0099cc;
+}
+
+/* Card accent */
+.card-accent {
+  border-left: 4px solid #0099cc;
+}
+
+/* Status indicators with #0099cc */
+.status-active {
+  background-color: #0099cc;
+  color: white;
+}
+
+/* Button primary */
+.btn-dashboard-primary {
+  background: linear-gradient(135deg, #0099cc 0%, #00d4ff 100%);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-dashboard-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 153, 204, 0.3);
+}
+
+/* Stats card */
+.stat-card {
+  background: #1a1f3a;
+  border: 1px solid #2d3250;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  border-color: #0099cc;
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(0, 153, 204, 0.2);
+}
+
+.stat-icon {
+  width: 3rem;
+  height: 3rem;
+  background: rgba(0, 153, 204, 0.1);
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0099cc;
+
+}
