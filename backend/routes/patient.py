@@ -1285,3 +1285,28 @@ def upgrade_plan(
         "message":      f"Upgraded to {plan_title} plan!",
         "subscription": p.get_subscription_info(),
     }
+
+# ══════════════════════════════════════════════════════════════════════════════
+# PATIENT CHANGE PASSWORD
+# ══════════════════════════════════════════════════════════════════════════════
+
+from pydantic import BaseModel as _PBM
+
+class PatientChangePasswordRequest(_PBM):
+    current_password: str
+    new_password: str
+
+@router.post("/change-password")
+def patient_change_password(
+    req: PatientChangePasswordRequest,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    from auth_utils import verify_password, hash_password as _hp
+    if not verify_password(req.current_password, current_user.password):
+        raise HTTPException(400, "Current password is incorrect")
+    if len(req.new_password) < 8:
+        raise HTTPException(400, "New password must be at least 8 characters")
+    current_user.password = _hp(req.new_password)
+    db.commit()
+    return {"message": "Password changed successfully"}

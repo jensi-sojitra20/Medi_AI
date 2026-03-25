@@ -442,3 +442,206 @@ def create_admin(
     db.commit()
     db.refresh(user)
     return {"message": "Admin created successfully", "admin_id": user.user_id}
+
+# ══════════════════════════════════════════════════════════════════════════════
+# CHANGE PASSWORD (authenticated admin)
+# ══════════════════════════════════════════════════════════════════════════════
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+@router.post("/change-password")
+def change_admin_password(
+    req: ChangePasswordRequest,
+    current_user=Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    from auth_utils import verify_password, hash_password as hp
+    if not verify_password(req.current_password, current_user.password):
+        raise HTTPException(400, "Current password is incorrect")
+    if len(req.new_password) < 8:
+        raise HTTPException(400, "New password must be at least 8 characters")
+    current_user.password = hp(req.new_password)
+    db.commit()
+    return {"message": "Password changed successfully"}
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# ADMIN NOTIFICATIONS
+# ══════════════════════════════════════════════════════════════════════════════
+
+@router.get("/notifications")
+def get_admin_notifications(
+    current_user=Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    notifs = (
+        db.query(models.Notification)
+        .filter(models.Notification.user_id == current_user.user_id)
+        .order_by(models.Notification.date.desc())
+        .limit(50).all()
+    )
+    def time_ago(dt):
+        if not dt: return ""
+        diff = datetime.utcnow() - dt
+        if diff.days == 0:
+            if diff.seconds < 3600: return f"{diff.seconds // 60}m ago"
+            return f"{diff.seconds // 3600}h ago"
+        if diff.days == 1: return "1 day ago"
+        if diff.days < 7: return f"{diff.days} days ago"
+        return dt.strftime("%b %d")
+
+    return {"notifications": [{
+        "id":      n.notification_id,
+        "message": n.message,
+        "time":    time_ago(n.date),
+        "is_read": n.is_read,
+    } for n in notifs]}
+
+
+@router.post("/notifications/mark-read")
+def mark_admin_notifications_read(
+    current_user=Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    db.query(models.Notification).filter(
+        models.Notification.user_id == current_user.user_id,
+        models.Notification.is_read == False,
+    ).update({"is_read": True})
+    db.commit()
+    return {"message": "All notifications marked as read"}
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# ANALYTICS — real data for dashboard charts
+# ══════════════════════════════════════════════════════════════════════════════
+
+@router.get("/analytics")
+def admin_analytics(
+    current_user=Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    from collections import defaultdict
+    import calendar
+
+    now = datetime.utcnow()
+
+    def _month_range(i):
+        """Return (year, month, label) for 'i months ago from now'."""
+        m = now.month - i
+        y = now.year
+        while m <= 0:
+            m += 12
+            y -= 1
+        return y, m, calendar.month_abbr[m]
+
+    # ── 1. Monthly subscription & revenue (last 6 months) ─────────────────
+    months_data = []
+    try:
+        for i in range(5, -1, -1):
+            y, m, label = _month_range(i)
+            month_start = datetime(y, m, 1)
+            if m == 12:
+                month_end = datetime(y + 1, 1, 1)
+            else:
+                month_end = datetime(y, m + 1, 1)
+
+            subs_count = db.query(models.Patient).filter(
+                models.Patient.subscription_start >= month_start,
+                models.Patient.subscription_start < month_end,
+            ).count()
+
+            basic_count = db.query(models.Patient).filter(
+                models.Patient.subscription_start >= month_start,
+                models.Patient.subscription_start < month_end,
+                models.Patient.subscription_plan == models.SubscriptionPlan.basic,
+            ).count()
+            premium_count = db.query(models.Patient).filter(
+                models.Patient.subscription_start >= month_start,
+                models.Patient.subscription_start < month_end,
+                models.Patient.subscription_plan == models.SubscriptionPlan.premium,
+            ).count()
+            revenue = (basic_count * 299) + (premium_count * 599)
+
+            months_data.append({"month": label, "subs": subs_count, "revenue": revenue})
+    except Exception as e:
+        print(f"[analytics] subscription_growth error: {e}")
+        months_data = [{"month": calendar.month_abbr[(now.month - i - 1) % 12 + 1], "subs": 0, "revenue": 0} for i in range(5, -1, -1)]
+
+    # ── 2. AI usage by day of week (last 30 days) — uses generated_date ───
+    ai_usage = [{"day": d, "usage": 0} for d in ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]]
+    try:
+        thirty_days_ago = now - timedelta(days=30)
+        ai_recs = db.query(models.AIRecommendation).filter(
+            models.AIRecommendation.generated_date >= thirty_days_ago,
+        ).all()
+
+        day_counts = defaultdict(int)
+        for rec in ai_recs:
+            if rec.generated_date:
+                day_counts[rec.generated_date.strftime("%a")] += 1
+
+        ai_usage = [{"day": d, "usage": day_counts.get(d, 0)}
+                    for d in ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]]
+    except Exception as e:
+        print(f"[analytics] ai_usage error: {e}")
+
+    # ── 3. AI approval-rate trend (last 6 months) — uses generated_date ───
+    accuracy_trend = []
+    try:
+        for i in range(5, -1, -1):
+            y, m, label = _month_range(i)
+            month_start = datetime(y, m, 1)
+            month_end   = datetime(y + 1, 1, 1) if m == 12 else datetime(y, m + 1, 1)
+
+            total = db.query(models.AIRecommendation).filter(
+                models.AIRecommendation.generated_date >= month_start,
+                models.AIRecommendation.generated_date < month_end,
+            ).count()
+            approved = db.query(models.AIRecommendation).filter(
+                models.AIRecommendation.generated_date >= month_start,
+                models.AIRecommendation.generated_date < month_end,
+                models.AIRecommendation.status == models.RecommendationStatus.approved,
+            ).count()
+
+            acc = round(approved / total * 100, 1) if total > 0 else None
+            accuracy_trend.append({"month": label, "acc": acc, "total": total})
+    except Exception as e:
+        print(f"[analytics] accuracy_trend error: {e}")
+
+    # ── 4. User distribution (real counts, always works) ──────────────────
+    user_dist = []
+    try:
+        total_patients = db.query(models.Patient).count()
+        total_doctors  = db.query(models.Doctor).count()
+        total_admins   = db.query(models.User).filter(
+            models.User.role == models.UserRole.admin
+        ).count()
+        grand_total = total_patients + total_doctors + total_admins
+
+        if grand_total > 0:
+            user_dist = [
+                {"name": "Patients", "value": round(total_patients / grand_total * 100), "count": total_patients, "color": "#0099cc"},
+                {"name": "Doctors",  "value": round(total_doctors  / grand_total * 100), "count": total_doctors,  "color": "#10b981"},
+                {"name": "Admins",   "value": round(total_admins   / grand_total * 100), "count": total_admins,   "color": "#f59e0b"},
+            ]
+            # Filter out zero-count roles
+            user_dist = [d for d in user_dist if d["count"] > 0]
+    except Exception as e:
+        print(f"[analytics] user_dist error: {e}")
+
+    # ── 5. Summary counts (for stat cards) ────────────────────────────────
+    total_ai_recs = 0
+    try:
+        total_ai_recs = db.query(models.AIRecommendation).count()
+    except Exception:
+        pass
+
+    return {
+        "subscription_growth": months_data,
+        "ai_usage": ai_usage,
+        "accuracy_trend": accuracy_trend,
+        "user_dist": user_dist,
+        "total_ai_predictions": total_ai_recs,
+    }

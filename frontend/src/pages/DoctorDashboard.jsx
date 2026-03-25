@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Users, Calendar, FileText, Activity, LogOut, Stethoscope, AlertCircle, CheckCircle2,
   Clock, Search, RefreshCw, Eye, X, Edit, Download, Share2, Settings, HelpCircle,
   MessageSquare, ChevronDown, Filter, Check, XCircle, User, Mail, Phone, MapPin,
-  Calendar as CalendarIcon, Save, Camera, Bell, Lock, Palette, BookOpen, FileQuestion,
+  Calendar as CalendarIcon, Save, Camera, Bell, Lock, Check, Palette, BookOpen, FileQuestion,
   MessageCircle, Copy, Facebook, Twitter, Linkedin
 } from 'lucide-react';
 import MediAiLogo from '../components/MediAiLogo';
@@ -77,6 +77,16 @@ const DoctorDashboard = () => {
   // ── Notification State ─────────────────────────────────────────────────────
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState({ type: '', message: '' });
+
+  // ── Bell notifications (real data from backend) ────────────────────────────
+  const [bellOpen, setBellOpen] = useState(false);
+  const [bellNotifs, setBellNotifs] = useState([]);
+  const [bellLoading, setBellLoading] = useState(false);
+  const bellRef = useRef(null);
+
+  // ── Password change state ──────────────────────────────────────────────────
+  const [pwForm, setPwForm] = useState({ current: '', newPw: '', confirm: '' });
+  const [pwSaving, setPwSaving] = useState(false);
 
   // ── Review State ───────────────────────────────────────────────────────────
   const [reviewMode, setReviewMode] = useState(null);
@@ -447,12 +457,56 @@ Date: ${new Date().toLocaleDateString()}
   };
 
   const handleSaveSettings = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      showSuccessNotification('⚙️ Settings saved successfully!');
-      setShowSettingsModal(false);
-    }, 1000);
+    localStorage.setItem('doctorSettings', JSON.stringify(settings));
+    showSuccessNotification('⚙️ Settings saved successfully!');
+    setShowSettingsModal(false);
+  };
+
+  // ── Bell notifications ─────────────────────────────────────────────────────
+  const loadBellNotifs = useCallback(async () => {
+    setBellLoading(true);
+    try {
+      const data = await apiFetch('/doctor/notifications');
+      setBellNotifs(data.notifications || []);
+    } catch (err) { console.warn('Notifs load failed:', err.message); }
+    finally { setBellLoading(false); }
+  }, []);
+
+  const markBellRead = useCallback(async () => {
+    try {
+      await apiFetch('/doctor/notifications/mark-read', { method: 'POST' });
+      setBellNotifs(ns => ns.map(n => ({ ...n, is_read: true })));
+    } catch { }
+  }, []);
+
+  // Close bell panel on outside click
+  useEffect(() => {
+    const handler = (e) => { if (bellRef.current && !bellRef.current.contains(e.target)) setBellOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  // Initial bell load
+  useEffect(() => { loadBellNotifs(); }, []); // eslint-disable-line
+
+  const bellUnread = bellNotifs.filter(n => !n.is_read).length;
+
+  // ── Password change ────────────────────────────────────────────────────────
+  const handlePasswordChange = async () => {
+    if (!pwForm.current) { showErrorNotification('Enter your current password'); return; }
+    if (!pwForm.newPw) { showErrorNotification('Enter a new password'); return; }
+    if (pwForm.newPw.length < 8) { showErrorNotification('New password must be at least 8 characters'); return; }
+    if (pwForm.newPw !== pwForm.confirm) { showErrorNotification('New passwords do not match'); return; }
+    setPwSaving(true);
+    try {
+      await apiFetch('/doctor/change-password', {
+        method: 'POST',
+        body: JSON.stringify({ current_password: pwForm.current, new_password: pwForm.newPw }),
+      });
+      showSuccessNotification('✅ Password changed successfully!');
+      setPwForm({ current: '', newPw: '', confirm: '' });
+    } catch (err) { showErrorNotification(`❌ ${err.message}`); }
+    finally { setPwSaving(false); }
   };
 
   const handleShare = (platform) => {
@@ -495,7 +549,7 @@ Date: ${new Date().toLocaleDateString()}
     const file = e.target.files[0];
     if (!file) return;
 
-    const allowed = ['image/jpeg','image/png','image/jpg','image/webp'];
+    const allowed = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
     if (!allowed.includes(file.type)) {
       showSuccessNotification('❌ Only JPG, PNG, or WebP images allowed');
       return;
@@ -973,6 +1027,50 @@ Date: ${new Date().toLocaleDateString()}
           Cancel
         </button>
       </div>
+
+      {/* ── Change Password ── */}
+      <div className="bg-dark-card border border-dark-border rounded-xl p-6">
+        <div className="flex items-center gap-2 mb-5">
+          <Lock className="w-5 h-5 text-brand-blue" />
+          <h3 className="text-lg font-semibold text-white">Change Password</h3>
+        </div>
+        <div className="flex items-center gap-2 px-4 py-3 bg-brand-blue/5 border border-brand-blue/20 rounded-lg mb-5">
+          <Lock className="w-4 h-4 text-brand-blue flex-shrink-0" />
+          <span className="text-sm text-gray-400">Password must be at least 8 characters long</span>
+        </div>
+        <div className="grid gap-4 max-w-lg">
+          {[
+            { label: 'Current Password', field: 'current', placeholder: 'Enter your current password' },
+            { label: 'New Password', field: 'newPw', placeholder: 'Enter new password (min 8 characters)' },
+            { label: 'Confirm New Password', field: 'confirm', placeholder: 'Re-enter your new password' },
+          ].map(({ label, field, placeholder }) => (
+            <div key={field}>
+              <label className="text-sm text-gray-400 mb-2 block">{label}</label>
+              <input
+                type="password"
+                placeholder={placeholder}
+                value={pwForm[field]}
+                onChange={e => setPwForm(f => ({ ...f, [field]: e.target.value }))}
+                onKeyDown={e => e.key === 'Enter' && handlePasswordChange()}
+                className={`w-full px-4 py-2.5 bg-dark-bg border rounded-lg text-white focus:outline-none transition-colors ${field === 'confirm' && pwForm.confirm && pwForm.newPw !== pwForm.confirm ? 'border-red-500 focus:border-red-500' : 'border-dark-border focus:border-brand-blue'}`}
+              />
+              {field === 'confirm' && pwForm.confirm && pwForm.newPw !== pwForm.confirm && (
+                <p className="text-red-400 text-xs mt-1">Passwords do not match</p>
+              )}
+              {field === 'confirm' && pwForm.confirm && pwForm.newPw === pwForm.confirm && pwForm.confirm.length > 0 && (
+                <p className="text-green-400 text-xs mt-1 flex items-center gap-1"><Check className="w-3 h-3" /> Passwords match</p>
+              )}
+            </div>
+          ))}
+          <button
+            onClick={handlePasswordChange}
+            disabled={pwSaving}
+            className="flex items-center justify-center gap-2 px-6 py-2.5 bg-gradient-to-r from-green-600 to-emerald-500 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50 self-start"
+          >
+            {pwSaving ? <><RefreshCw className="w-4 h-4 animate-spin" /> Updating…</> : <><Check className="w-4 h-4" /> Update Password</>}
+          </button>
+        </div>
+      </div>
     </div>
   );
 
@@ -1093,10 +1191,78 @@ Date: ${new Date().toLocaleDateString()}
                 {currentPage === 'profile' && 'Update your profile'}
               </p>
             </div>
-            <button onClick={() => setShowShareModal(true)} className="flex items-center gap-2 px-4 py-2 bg-dark-bg border border-dark-border text-gray-400 rounded-lg hover:border-brand-blue hover:text-white transition-colors">
-              <Share2 className="w-4 h-4" />
-              <span>Share</span>
-            </button>
+            <div className="flex items-center gap-3">
+              {/* ── BELL NOTIFICATIONS ── */}
+              <div ref={bellRef} style={{ position: 'relative' }}>
+                <button
+                  onClick={() => {
+                    const opening = !bellOpen;
+                    setBellOpen(opening);
+                    if (opening) { loadBellNotifs(); if (bellUnread > 0) markBellRead(); }
+                  }}
+                  className={`relative p-2 rounded-lg border transition-all ${bellOpen ? 'bg-brand-blue/10 border-brand-blue/40 text-brand-blue' : 'bg-dark-bg border-dark-border text-gray-400 hover:text-white hover:border-brand-blue/30'}`}
+                >
+                  <Bell className="w-5 h-5" />
+                  {bellUnread > 0 && (
+                    <span style={{ position: 'absolute', top: 4, right: 4, minWidth: 16, height: 16, borderRadius: 999, background: '#ef4444', color: '#fff', fontSize: 9, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 3px' }}>
+                      {bellUnread > 9 ? '9+' : bellUnread}
+                    </span>
+                  )}
+                </button>
+
+                {bellOpen && (
+                  <div style={{ position: 'absolute', top: 'calc(100% + 8px)', right: 0, width: 340, maxHeight: 440, background: '#1a2235', border: '1px solid rgba(0,153,204,0.18)', borderRadius: 14, boxShadow: '0 12px 48px rgba(0,0,0,0.7)', overflow: 'hidden', display: 'flex', flexDirection: 'column', zIndex: 200 }}>
+                    <div style={{ padding: '13px 16px', borderBottom: '1px solid rgba(0,153,204,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ fontWeight: 700, color: '#f1f5f9', fontSize: 14 }}>Notifications</span>
+                        {bellUnread > 0 && <span style={{ padding: '1px 7px', borderRadius: 999, background: 'rgba(239,68,68,0.2)', color: '#ef4444', fontSize: 11, fontWeight: 700 }}>{bellUnread} new</span>}
+                      </div>
+                      <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                        <button onClick={loadBellNotifs} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', display: 'flex', padding: 4, borderRadius: 6 }}>
+                          <RefreshCw size={12} />
+                        </button>
+                        {bellNotifs.some(n => !n.is_read) && (
+                          <button onClick={markBellRead} style={{ fontSize: 11, color: '#0099cc', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
+                            Mark all read
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    <div style={{ overflowY: 'auto', flex: 1 }}>
+                      {bellLoading ? (
+                        <div style={{ padding: 40, textAlign: 'center', color: '#64748b', fontSize: 13 }}>
+                          <RefreshCw size={20} style={{ animation: 'spin 1s linear infinite', margin: '0 auto 8px', display: 'block', color: '#0099cc' }} />
+                          Loading…
+                        </div>
+                      ) : bellNotifs.length === 0 ? (
+                        <div style={{ padding: 48, textAlign: 'center' }}>
+                          <Bell size={28} style={{ margin: '0 auto 10px', display: 'block', color: '#64748b' }} />
+                          <div style={{ color: '#64748b', fontSize: 13, fontWeight: 500 }}>No notifications yet</div>
+                          <div style={{ color: '#64748b', fontSize: 11, marginTop: 4 }}>You'll see alerts when patients are assigned or reports reviewed</div>
+                        </div>
+                      ) : (
+                        bellNotifs.map((n, i) => (
+                          <div key={n.id || i} style={{ padding: '11px 16px', borderBottom: i < bellNotifs.length - 1 ? '1px solid rgba(0,153,204,0.08)' : 'none', background: n.is_read ? 'transparent' : 'rgba(0,153,204,0.05)' }}>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
+                              <div style={{ width: 7, height: 7, borderRadius: '50%', background: n.is_read ? '#64748b' : '#0099cc', marginTop: 5, flexShrink: 0 }} />
+                              <div>
+                                <div style={{ fontSize: 13, color: '#f1f5f9', lineHeight: 1.5 }}>{n.message}</div>
+                                <div style={{ fontSize: 11, color: '#64748b', marginTop: 3 }}>{n.time}</div>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <button onClick={() => setShowShareModal(true)} className="flex items-center gap-2 px-4 py-2 bg-dark-bg border border-dark-border text-gray-400 rounded-lg hover:border-brand-blue hover:text-white transition-colors">
+                <Share2 className="w-4 h-4" />
+                <span>Share</span>
+              </button>
+            </div>
           </div>
         </header>
 
@@ -1378,8 +1544,8 @@ Date: ${new Date().toLocaleDateString()}
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="w-full max-w-md">
             <div className="relative">
-              <button 
-                onClick={() => setShowFeedbackModal(false)} 
+              <button
+                onClick={() => setShowFeedbackModal(false)}
                 className="absolute -top-10 right-0 p-2 hover:bg-dark-bg rounded-lg transition-colors z-10"
               >
                 <X className="w-5 h-5 text-gray-400" />
@@ -1408,6 +1574,8 @@ Date: ${new Date().toLocaleDateString()}
           </div>
         </div>
       )}
+
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 };

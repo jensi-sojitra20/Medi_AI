@@ -870,3 +870,83 @@ def submit_doctor_feedback(
     db.add(fb)
     db.commit()
     return {"message": "Feedback submitted successfully. Thank you!"}
+
+# ══════════════════════════════════════════════════════════════════════════════
+# DOCTOR NOTIFICATIONS
+# ══════════════════════════════════════════════════════════════════════════════
+
+@router.get("/notifications")
+def get_doctor_notifications(
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if current_user.role != models.UserRole.doctor:
+        raise HTTPException(403, "Doctor access only")
+
+    from datetime import datetime as _dt
+
+    def _time_ago(dt):
+        if not dt: return ""
+        diff = _dt.utcnow() - dt
+        if diff.days == 0:
+            if diff.seconds < 3600: return f"{diff.seconds // 60}m ago"
+            return f"{diff.seconds // 3600}h ago"
+        if diff.days == 1: return "1 day ago"
+        if diff.days < 7:  return f"{diff.days} days ago"
+        return dt.strftime("%b %d")
+
+    notifs = (
+        db.query(models.Notification)
+        .filter(models.Notification.user_id == current_user.user_id)
+        .order_by(models.Notification.date.desc())
+        .limit(50).all()
+    )
+    return {"notifications": [{
+        "id":      n.notification_id,
+        "message": n.message,
+        "time":    _time_ago(n.date),
+        "is_read": n.is_read,
+    } for n in notifs]}
+
+
+@router.post("/notifications/mark-read")
+def mark_doctor_notifications_read(
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if current_user.role != models.UserRole.doctor:
+        raise HTTPException(403, "Doctor access only")
+    db.query(models.Notification).filter(
+        models.Notification.user_id == current_user.user_id,
+        models.Notification.is_read == False,
+    ).update({"is_read": True})
+    db.commit()
+    return {"message": "All notifications marked as read"}
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# DOCTOR CHANGE PASSWORD
+# ══════════════════════════════════════════════════════════════════════════════
+
+from pydantic import BaseModel as _BM
+
+class DoctorChangePasswordRequest(_BM):
+    current_password: str
+    new_password: str
+
+@router.post("/change-password")
+def doctor_change_password(
+    req: DoctorChangePasswordRequest,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if current_user.role != models.UserRole.doctor:
+        raise HTTPException(403, "Doctor access only")
+    from auth_utils import verify_password, hash_password as _hp
+    if not verify_password(req.current_password, current_user.password):
+        raise HTTPException(400, "Current password is incorrect")
+    if len(req.new_password) < 8:
+        raise HTTPException(400, "New password must be at least 8 characters")
+    current_user.password = _hp(req.new_password)
+    db.commit()
+    return {"message": "Password changed successfully"}

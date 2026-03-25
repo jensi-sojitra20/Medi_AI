@@ -10,7 +10,7 @@ import {
   ThumbsUp, ThumbsDown, RotateCcw, Search, BookOpen, Pill as PillIcon,
   TrendingUp, Shield, Info, HelpCircle, MessageCircle, Hash,
   ArrowUpRight, Loader2, WifiOff, HeartPulse, Thermometer,
-  Syringe, FlaskConical, ScanLine, Microscope
+  Syringe, FlaskConical, ScanLine, Microscope, Lock
 } from 'lucide-react';
 import MediAiLogo from "../components/MediAiLogo";
 import FeedbackModal from "../components/FeedbackModal";
@@ -93,11 +93,11 @@ const Btn = ({ children, onClick, variant = 'primary', style, icon: Icon, disabl
 
 const Badge = ({ children, color = 'blue' }) => {
   const map = {
-    blue:   [T.cyan,   'rgba(0,153,204,0.12)'],
-    green:  [T.green,  'rgba(16,185,129,0.12)'],
-    red:    [T.red,    'rgba(239,68,68,0.12)'],
-    amber:  [T.amber,  'rgba(245,158,11,0.12)'],
-    gray:   [T.muted,  'rgba(100,116,139,0.12)'],
+    blue: [T.cyan, 'rgba(0,153,204,0.12)'],
+    green: [T.green, 'rgba(16,185,129,0.12)'],
+    red: [T.red, 'rgba(239,68,68,0.12)'],
+    amber: [T.amber, 'rgba(245,158,11,0.12)'],
+    gray: [T.muted, 'rgba(100,116,139,0.12)'],
     purple: [T.purple, 'rgba(139,92,246,0.12)'],
   };
   const [fg, bg] = map[color] || map.blue;
@@ -139,72 +139,72 @@ const Modal = ({ isOpen, onClose, title, children }) => {
 // ════════════════════════════════════════════════════════════════════════════
 
 const MEDICAL_TESTS = [
-  'hemoglobin','haemoglobin','hgb','hb',
-  'wbc','white blood cell','white blood count','leukocyte',
-  'rbc','red blood cell','erythrocyte',
-  'platelet','thrombocyte','plt',
-  'glucose','blood sugar','fasting glucose','post prandial','ppbs',
-  'cholesterol','ldl','hdl','vldl','triglyceride','triglycerides','lipid profile',
-  'blood pressure','systolic','diastolic',
-  'creatinine','serum creatinine',
-  'urea','blood urea nitrogen','bun',
-  'sodium','potassium','chloride','bicarbonate','electrolyte',
-  'bilirubin','total bilirubin','direct bilirubin','indirect bilirubin',
+  'hemoglobin', 'haemoglobin', 'hgb', 'hb',
+  'wbc', 'white blood cell', 'white blood count', 'leukocyte',
+  'rbc', 'red blood cell', 'erythrocyte',
+  'platelet', 'thrombocyte', 'plt',
+  'glucose', 'blood sugar', 'fasting glucose', 'post prandial', 'ppbs',
+  'cholesterol', 'ldl', 'hdl', 'vldl', 'triglyceride', 'triglycerides', 'lipid profile',
+  'blood pressure', 'systolic', 'diastolic',
+  'creatinine', 'serum creatinine',
+  'urea', 'blood urea nitrogen', 'bun',
+  'sodium', 'potassium', 'chloride', 'bicarbonate', 'electrolyte',
+  'bilirubin', 'total bilirubin', 'direct bilirubin', 'indirect bilirubin',
   'uric acid',
-  'hba1c','glycated hemoglobin','glycosylated hemoglobin',
-  'tsh','thyroid stimulating hormone','t3','t4','thyroxine','triiodothyronine',
-  'sgpt','sgot','alt','ast','alp','alkaline phosphatase','ggt',
-  'albumin','total protein','globulin','a/g ratio',
-  'esr','erythrocyte sedimentation rate',
-  'vitamin d','vitamin b12','vitamin b','folate','ferritin','serum iron','tibc',
-  'mcv','mch','mchc','rdw','hematocrit','pcv','packed cell volume',
-  'neutrophil','lymphocyte','monocyte','eosinophil','basophil','differential count',
-  'urine protein','urine glucose','urine ketone','urine creatinine','urine culture',
-  'inr','pt','prothrombin','aptt','coagulation','d dimer',
-  'calcium','phosphorus','magnesium','zinc','copper',
-  'amylase','lipase','psa','prostate specific antigen',
-  'dengue','malaria','typhoid','widal','hiv','hbsag','anti hcv','hepatitis',
-  'covid','sars','antigen','antibody','titer','immunoglobulin','igg','igm',
-  'culture','sensitivity','organism','colony count','bacteria',
-  'ecg','electrocardiogram','eeg','echo','echocardiogram','stress test',
-  'cbc','complete blood count','complete blood picture','haemogram',
+  'hba1c', 'glycated hemoglobin', 'glycosylated hemoglobin',
+  'tsh', 'thyroid stimulating hormone', 't3', 't4', 'thyroxine', 'triiodothyronine',
+  'sgpt', 'sgot', 'alt', 'ast', 'alp', 'alkaline phosphatase', 'ggt',
+  'albumin', 'total protein', 'globulin', 'a/g ratio',
+  'esr', 'erythrocyte sedimentation rate',
+  'vitamin d', 'vitamin b12', 'vitamin b', 'folate', 'ferritin', 'serum iron', 'tibc',
+  'mcv', 'mch', 'mchc', 'rdw', 'hematocrit', 'pcv', 'packed cell volume',
+  'neutrophil', 'lymphocyte', 'monocyte', 'eosinophil', 'basophil', 'differential count',
+  'urine protein', 'urine glucose', 'urine ketone', 'urine creatinine', 'urine culture',
+  'inr', 'pt', 'prothrombin', 'aptt', 'coagulation', 'd dimer',
+  'calcium', 'phosphorus', 'magnesium', 'zinc', 'copper',
+  'amylase', 'lipase', 'psa', 'prostate specific antigen',
+  'dengue', 'malaria', 'typhoid', 'widal', 'hiv', 'hbsag', 'anti hcv', 'hepatitis',
+  'covid', 'sars', 'antigen', 'antibody', 'titer', 'immunoglobulin', 'igg', 'igm',
+  'culture', 'sensitivity', 'organism', 'colony count', 'bacteria',
+  'ecg', 'electrocardiogram', 'eeg', 'echo', 'echocardiogram', 'stress test',
+  'cbc', 'complete blood count', 'complete blood picture', 'haemogram',
 ];
 
 const REPORT_STRUCTURE = [
-  'patient name','patient id','patient no','patient:',
-  'age','gender','sex','date of birth','dob',
-  'sample','specimen','sample type','sample id','sample collected',
-  'reference range','normal range','normal value','biological reference',
-  'result','value','findings','observation',
-  'units','unit',
-  'report date','collection date','date of collection','reported on',
-  'registration no','lab no','report no','barcode','accession no',
-  'remarks','comment','interpretation','impression','conclusion',
-  'tested by','verified by','authorized by','approved by','reported by',
-  'lab technician','pathologist','radiologist','consulting',
+  'patient name', 'patient id', 'patient no', 'patient:',
+  'age', 'gender', 'sex', 'date of birth', 'dob',
+  'sample', 'specimen', 'sample type', 'sample id', 'sample collected',
+  'reference range', 'normal range', 'normal value', 'biological reference',
+  'result', 'value', 'findings', 'observation',
+  'units', 'unit',
+  'report date', 'collection date', 'date of collection', 'reported on',
+  'registration no', 'lab no', 'report no', 'barcode', 'accession no',
+  'remarks', 'comment', 'interpretation', 'impression', 'conclusion',
+  'tested by', 'verified by', 'authorized by', 'approved by', 'reported by',
+  'lab technician', 'pathologist', 'radiologist', 'consulting',
 ];
 
 const MEDICAL_SOURCE = [
-  'hospital','clinic','diagnostic','diagnostics',
-  'laboratory','lab report','pathology','radiology','imaging centre',
-  'doctor','physician','consultant','dr.','dr ',
-  'mbbs','md ','ms ','dgo','phd','dnb','frcp','mrcp',
-  'health care','healthcare','medical centre','medical center',
-  'nursing home','dispensary','pharmacy','chemist',
-  'department of','dept of','division of',
-  'opd','ipd','ward','icu','emergency','casualty',
-  'city hospital','general hospital','medical college','pvt ltd',
+  'hospital', 'clinic', 'diagnostic', 'diagnostics',
+  'laboratory', 'lab report', 'pathology', 'radiology', 'imaging centre',
+  'doctor', 'physician', 'consultant', 'dr.', 'dr ',
+  'mbbs', 'md ', 'ms ', 'dgo', 'phd', 'dnb', 'frcp', 'mrcp',
+  'health care', 'healthcare', 'medical centre', 'medical center',
+  'nursing home', 'dispensary', 'pharmacy', 'chemist',
+  'department of', 'dept of', 'division of',
+  'opd', 'ipd', 'ward', 'icu', 'emergency', 'casualty',
+  'city hospital', 'general hospital', 'medical college', 'pvt ltd',
 ];
 
 const PRESCRIPTION_KEYWORDS = [
-  'prescription','rx','rx:',
-  'medicine','medication','drug name',
-  'tablet','tab ','cap ','capsule','syrup','injection','inj ','drops','ointment',
-  'dose','dosage',
-  'twice daily','once daily','three times','tds','bd ','od ','qid','sos',
-  'after meal','before meal','with food','empty stomach','at bedtime',
-  'days','weeks','months','duration','refill','dispense',
-  'mg ','ml ','mcg ','iu ','units',
+  'prescription', 'rx', 'rx:',
+  'medicine', 'medication', 'drug name',
+  'tablet', 'tab ', 'cap ', 'capsule', 'syrup', 'injection', 'inj ', 'drops', 'ointment',
+  'dose', 'dosage',
+  'twice daily', 'once daily', 'three times', 'tds', 'bd ', 'od ', 'qid', 'sos',
+  'after meal', 'before meal', 'with food', 'empty stomach', 'at bedtime',
+  'days', 'weeks', 'months', 'duration', 'refill', 'dispense',
+  'mg ', 'ml ', 'mcg ', 'iu ', 'units',
 ];
 
 const fuzzyMatch = (text, keyword) => {
@@ -221,38 +221,38 @@ const fuzzyMatch = (text, keyword) => {
   return false;
 };
 
-const UNIT_PATTERN   = /\d+(\.\d+)?\s*(mg\/dl|g\/dl|mg\/l|mmol\/l|u\/l|iu\/l|miu\/ml|ng\/ml|pg\/ml|nmol\/l|mmhg|cells\/mm|cells\/ul|mm\/hr|g\/l|meq\/l|%|fl\b|pg\b)/i;
-const VALUE_PATTERN  = /\b\d{1,6}(\.\d{1,3})?\b.{0,30}\b(normal|abnormal|high|low|positive|negative|reactive|non.reactive|detected|not detected)\b/i;
-const RANGE_PATTERN  = /\d+(\.\d+)?\s*[-–—]\s*\d+(\.\d+)?/;
+const UNIT_PATTERN = /\d+(\.\d+)?\s*(mg\/dl|g\/dl|mg\/l|mmol\/l|u\/l|iu\/l|miu\/ml|ng\/ml|pg\/ml|nmol\/l|mmhg|cells\/mm|cells\/ul|mm\/hr|g\/l|meq\/l|%|fl\b|pg\b)/i;
+const VALUE_PATTERN = /\b\d{1,6}(\.\d{1,3})?\b.{0,30}\b(normal|abnormal|high|low|positive|negative|reactive|non.reactive|detected|not detected)\b/i;
+const RANGE_PATTERN = /\d+(\.\d+)?\s*[-–—]\s*\d+(\.\d+)?/;
 
 const scoreMedicalText = (text) => {
   const t = text.toLowerCase();
   let score = 0;
   const found = [];
-  for (const kw of MEDICAL_TESTS)          { if (fuzzyMatch(t, kw)) { score += 3; found.push(kw); } }
-  for (const kw of REPORT_STRUCTURE)       { if (fuzzyMatch(t, kw)) { score += 2; found.push(kw); } }
-  for (const kw of MEDICAL_SOURCE)         { if (fuzzyMatch(t, kw)) { score += 2; found.push(kw); } }
-  for (const kw of PRESCRIPTION_KEYWORDS)  { if (fuzzyMatch(t, kw)) { score += 2; found.push(kw); } }
-  if (UNIT_PATTERN.test(t))   { score += 2; found.push('_medical_units');   }
-  if (VALUE_PATTERN.test(t))  { score += 2; found.push('_lab_values');      }
-  if (RANGE_PATTERN.test(t))  { score += 1; found.push('_reference_range'); }
+  for (const kw of MEDICAL_TESTS) { if (fuzzyMatch(t, kw)) { score += 3; found.push(kw); } }
+  for (const kw of REPORT_STRUCTURE) { if (fuzzyMatch(t, kw)) { score += 2; found.push(kw); } }
+  for (const kw of MEDICAL_SOURCE) { if (fuzzyMatch(t, kw)) { score += 2; found.push(kw); } }
+  for (const kw of PRESCRIPTION_KEYWORDS) { if (fuzzyMatch(t, kw)) { score += 2; found.push(kw); } }
+  if (UNIT_PATTERN.test(t)) { score += 2; found.push('_medical_units'); }
+  if (VALUE_PATTERN.test(t)) { score += 2; found.push('_lab_values'); }
+  if (RANGE_PATTERN.test(t)) { score += 1; found.push('_reference_range'); }
   return { score, found: [...new Set(found)] };
 };
 
 const detectReportTypeFromFilename = (filename) => {
   const n = filename.toLowerCase().replace(/[_\-\.]/g, ' ');
   if (/\b(blood|cbc|hemoglobin|haemoglobin|wbc|rbc|platelet)\b/.test(n)) return 'Blood Test Report';
-  if (/\b(sugar|glucose|diabetes|hba1c)\b/.test(n))                       return 'Diabetes Report';
-  if (/\b(cholesterol|lipid|ldl|hdl|triglyceride)\b/.test(n))             return 'Lipid Profile Report';
-  if (/\b(thyroid|tsh)\b/.test(n))                                         return 'Thyroid Report';
-  if (/\b(liver|lft|sgpt|sgot|bilirubin)\b/.test(n))                      return 'Liver Function Report';
-  if (/\b(kidney|urine|creatinine|urea|kft)\b/.test(n))                   return 'Kidney/Urine Report';
-  if (/\b(xray|x ray|chest|radiograph)\b/.test(n))                        return 'X-Ray Report';
-  if (/\b(mri|ct scan|ultrasound|sonography|echo)\b/.test(n))             return 'Imaging Report';
-  if (/\b(prescription|rx|medicine|tablet)\b/.test(n))                    return 'Prescription';
-  if (/\b(discharge|summary)\b/.test(n))                                  return 'Discharge Summary';
-  if (/\b(ecg|cardio|heart)\b/.test(n))                                   return 'Cardiology Report';
-  if (/\b(report|result|lab|test|pathology|diagnostic)\b/.test(n))        return 'Lab Report';
+  if (/\b(sugar|glucose|diabetes|hba1c)\b/.test(n)) return 'Diabetes Report';
+  if (/\b(cholesterol|lipid|ldl|hdl|triglyceride)\b/.test(n)) return 'Lipid Profile Report';
+  if (/\b(thyroid|tsh)\b/.test(n)) return 'Thyroid Report';
+  if (/\b(liver|lft|sgpt|sgot|bilirubin)\b/.test(n)) return 'Liver Function Report';
+  if (/\b(kidney|urine|creatinine|urea|kft)\b/.test(n)) return 'Kidney/Urine Report';
+  if (/\b(xray|x ray|chest|radiograph)\b/.test(n)) return 'X-Ray Report';
+  if (/\b(mri|ct scan|ultrasound|sonography|echo)\b/.test(n)) return 'Imaging Report';
+  if (/\b(prescription|rx|medicine|tablet)\b/.test(n)) return 'Prescription';
+  if (/\b(discharge|summary)\b/.test(n)) return 'Discharge Summary';
+  if (/\b(ecg|cardio|heart)\b/.test(n)) return 'Cardiology Report';
+  if (/\b(report|result|lab|test|pathology|diagnostic)\b/.test(n)) return 'Lab Report';
   return 'Medical Document';
 };
 
@@ -271,7 +271,7 @@ const loadTesseract = () => new Promise((resolve, reject) => {
 const extractTextFromImage = async (file) => {
   const Tesseract = await loadTesseract();
   const dataUrl = await new Promise((res, rej) => { const r = new FileReader(); r.onload = e => res(e.target.result); r.onerror = rej; r.readAsDataURL(file); });
-  const { data: { text } } = await Tesseract.recognize(dataUrl, 'eng', { logger: () => {} });
+  const { data: { text } } = await Tesseract.recognize(dataUrl, 'eng', { logger: () => { } });
   return text || '';
 };
 
@@ -313,7 +313,7 @@ const extractEntities = (text) => {
   const t = text;
   const tl = t.toLowerCase();
   let patientName = null;
-  const namePatterns = [/patient\s*(?:name)?\s*[:\-]\s*([A-Za-z][A-Za-z ]{2,40})/i,/name\s*[:\-]\s*([A-Za-z][A-Za-z ]{2,40})/i,/mr\.?\s+([A-Za-z][A-Za-z ]{2,30})/i,/mrs\.?\s+([A-Za-z][A-Za-z ]{2,30})/i,/ms\.?\s+([A-Za-z][A-Za-z ]{2,30})/i];
+  const namePatterns = [/patient\s*(?:name)?\s*[:\-]\s*([A-Za-z][A-Za-z ]{2,40})/i, /name\s*[:\-]\s*([A-Za-z][A-Za-z ]{2,40})/i, /mr\.?\s+([A-Za-z][A-Za-z ]{2,30})/i, /mrs\.?\s+([A-Za-z][A-Za-z ]{2,30})/i, /ms\.?\s+([A-Za-z][A-Za-z ]{2,30})/i];
   for (const pat of namePatterns) { const m = t.match(pat); if (m?.[1]) { patientName = m[1].trim(); break; } }
   let patientAge = null;
   const ageMatch = t.match(/(?:age|aged?)\s*[:\-]?\s*(\d{1,3})\s*(?:yrs?|years?)?/i);
@@ -322,10 +322,10 @@ const extractEntities = (text) => {
   if (/\bgender\s*[:\-]\s*male\b|\bsex\s*[:\-]\s*male\b|\bm\s*\/\s*\d|\bmale\b/i.test(t)) patientGender = 'Male';
   else if (/\bgender\s*[:\-]\s*female\b|\bsex\s*[:\-]\s*female\b|\bf\s*\/\s*\d|\bfemale\b/i.test(t)) patientGender = 'Female';
   let reportDate = null;
-  const datePatterns = [/(?:date|dated|report date|collection date|reported on)\s*[:\-]?\s*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/i,/(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/,/(\d{1,2}\s+(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+\d{4})/i];
+  const datePatterns = [/(?:date|dated|report date|collection date|reported on)\s*[:\-]?\s*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})/i, /(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/, /(\d{1,2}\s+(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+\d{4})/i];
   for (const pat of datePatterns) { const m = t.match(pat); if (m?.[1]) { reportDate = m[1].trim(); break; } }
   let doctorName = null;
-  const drPatterns = [/(?:doctor|physician|consultant|referred by|dr\.?)\s*[:\-]?\s*(?:dr\.?\s+)?([A-Za-z][A-Za-z ]{2,40})/i,/(?:reported by|verified by|authorized by|tested by)\s*[:\-]?\s*(?:dr\.?\s+)?([A-Za-z][A-Za-z ]{2,40})/i,/Dr\.?\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/];
+  const drPatterns = [/(?:doctor|physician|consultant|referred by|dr\.?)\s*[:\-]?\s*(?:dr\.?\s+)?([A-Za-z][A-Za-z ]{2,40})/i, /(?:reported by|verified by|authorized by|tested by)\s*[:\-]?\s*(?:dr\.?\s+)?([A-Za-z][A-Za-z ]{2,40})/i, /Dr\.?\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/];
   for (const pat of drPatterns) { const m = t.match(pat); if (m?.[1] && !m[1].match(/^(test|report|lab|result)/i)) { doctorName = m[1].trim(); break; } }
   let hospitalName = null;
   const hospMatch = t.match(/(?:^|\n)\s*([A-Z][A-Za-z\s]{3,50}(?:hospital|clinic|diagnostic|laboratory|lab|health|medical centre|medical center|pathology))/im);
@@ -349,21 +349,21 @@ const extractEntities = (text) => {
   const diagSection = t.match(/(?:diagnosis|impression|conclusion|findings|assessment)\s*[:\-]?\s*([\s\S]{10,300}?)(?:\n\n|\n[A-Z]|$)/i);
   if (diagSection) { const raw = diagSection[1].replace(/\n/g, ' ').trim(); if (raw.length < 300) diagnoses.push(raw); }
   const DIAG_MAP = [
-    { pattern: /\bdiabetes\b|\bdiabetic\b/i, label: 'diabetes' },{ pattern: /\bpre.diabet/i, label: 'pre-diabetes' },
-    { pattern: /\bhypertension\b|\bhigh blood pressure\b/i, label: 'hypertension' },{ pattern: /\bhyperlipidemia\b|\bhigh cholesterol\b/i, label: 'hyperlipidemia' },
-    { pattern: /\banaemia\b|\banemia\b/i, label: 'anaemia' },{ pattern: /\bhypothyroid/i, label: 'hypothyroidism' },
-    { pattern: /\bhyperthyroid/i, label: 'hyperthyroidism' },{ pattern: /\bckd\b|\bchronic kidney\b/i, label: 'chronic kidney disease' },
-    { pattern: /\bcovid\b|\bsars.cov/i, label: 'COVID-19' },{ pattern: /\bdengue\b/i, label: 'dengue' },
-    { pattern: /\bmalaria\b/i, label: 'malaria' },{ pattern: /\btyphoid\b/i, label: 'typhoid' },
+    { pattern: /\bdiabetes\b|\bdiabetic\b/i, label: 'diabetes' }, { pattern: /\bpre.diabet/i, label: 'pre-diabetes' },
+    { pattern: /\bhypertension\b|\bhigh blood pressure\b/i, label: 'hypertension' }, { pattern: /\bhyperlipidemia\b|\bhigh cholesterol\b/i, label: 'hyperlipidemia' },
+    { pattern: /\banaemia\b|\banemia\b/i, label: 'anaemia' }, { pattern: /\bhypothyroid/i, label: 'hypothyroidism' },
+    { pattern: /\bhyperthyroid/i, label: 'hyperthyroidism' }, { pattern: /\bckd\b|\bchronic kidney\b/i, label: 'chronic kidney disease' },
+    { pattern: /\bcovid\b|\bsars.cov/i, label: 'COVID-19' }, { pattern: /\bdengue\b/i, label: 'dengue' },
+    { pattern: /\bmalaria\b/i, label: 'malaria' }, { pattern: /\btyphoid\b/i, label: 'typhoid' },
   ];
   for (const { pattern, label } of DIAG_MAP) { if (pattern.test(tl) && !diagnoses.includes(label)) diagnoses.push(label); }
   const medicines = [];
-  const medPatterns = [/(?:tab(?:let)?|cap(?:sule)?|syrup|inj(?:ection)?|drops?)\s+([A-Za-z][A-Za-z\s]{2,30})\s*(\d+\s*mg|\d+\s*ml|\d+\s*mcg)?/gi,/([A-Z][a-z]+(?:cin|mab|zole|pril|artan|statin|mycin|olol|pam|pine|dine|ide|one|ine|ate))\s*(\d+\s*mg)?/g];
+  const medPatterns = [/(?:tab(?:let)?|cap(?:sule)?|syrup|inj(?:ection)?|drops?)\s+([A-Za-z][A-Za-z\s]{2,30})\s*(\d+\s*mg|\d+\s*ml|\d+\s*mcg)?/gi, /([A-Z][a-z]+(?:cin|mab|zole|pril|artan|statin|mycin|olol|pam|pine|dine|ide|one|ine|ate))\s*(\d+\s*mg)?/g];
   for (const pat of medPatterns) { let m; while ((m = pat.exec(t)) !== null) { const med = (m[1] + (m[2] ? ' ' + m[2] : '')).trim(); if (med.length > 3 && !medicines.includes(med)) medicines.push(med); } }
   const summaryLines = [];
   if (patientName) summaryLines.push(`Patient: ${patientName}${patientAge ? ', Age: ' + patientAge : ''}${patientGender ? ', ' + patientGender : ''}`);
-  if (reportDate)  summaryLines.push(`Report Date: ${reportDate}`);
-  if (doctorName)  summaryLines.push(`Doctor: Dr. ${doctorName}`);
+  if (reportDate) summaryLines.push(`Report Date: ${reportDate}`);
+  if (doctorName) summaryLines.push(`Doctor: Dr. ${doctorName}`);
   if (hospitalName) summaryLines.push(`Lab/Hospital: ${hospitalName}`);
   if (testResults.length > 0) { summaryLines.push('\nTest Results:'); testResults.slice(0, 20).forEach(r => { let line = `  ${r.name}: ${r.value}${r.unit ? ' ' + r.unit : ''}`; if (r.range) line += ` (Normal: ${r.range})`; if (r.flag && r.flag !== 'NORMAL') line += ` ← ${r.flag}`; summaryLines.push(line); }); }
   if (diagnoses.length > 0) summaryLines.push(`\nDiagnosis/Impression: ${diagnoses.join(', ')}`);
@@ -371,8 +371,8 @@ const extractEntities = (text) => {
   return { patientName, patientAge, patientGender, reportDate, doctorName, hospitalName, testResults: testResults.slice(0, 30), diagnoses, medicines: medicines.slice(0, 15), summary: summaryLines.join('\n'), rawText: text };
 };
 
-const NON_PATIENT_PATTERNS = [/\b(abstract|introduction|methodology|conclusion|references|bibliography)\b/i,/\b(case report|case study|clinical case|case series)\b/i,/\b(journal|volume|issue|issn|doi|published|submitted|revised|online)\b/i,/\b(research|study|literature|review|manuscript|publication|author)\b/i,/\b(copyright|©|all rights reserved|reproduced|permission)\b/i,/\b(figure \d|table \d|appendix|supplementary)\b/i,/\b(et al|ibid|op cit|cf\.|viz\.)\b/i];
-const KEYWORDS = ['patient','age','doctor','hospital','clinic','laboratory','lab','diagnostic','diagnosis','test','result','report','blood','hemoglobin','wbc','rbc','platelet','glucose','cholesterol','urea','creatinine','bilirubin','sgpt','sgot','thyroid','tsh','hba1c','urine','prescription','medicine','tablet','dose','mg','ml','temperature','pulse','bp','blood pressure','weight','height','findings','impression','specimen','sample','reference','normal range','date','name'];
+const NON_PATIENT_PATTERNS = [/\b(abstract|introduction|methodology|conclusion|references|bibliography)\b/i, /\b(case report|case study|clinical case|case series)\b/i, /\b(journal|volume|issue|issn|doi|published|submitted|revised|online)\b/i, /\b(research|study|literature|review|manuscript|publication|author)\b/i, /\b(copyright|©|all rights reserved|reproduced|permission)\b/i, /\b(figure \d|table \d|appendix|supplementary)\b/i, /\b(et al|ibid|op cit|cf\.|viz\.)\b/i];
+const KEYWORDS = ['patient', 'age', 'doctor', 'hospital', 'clinic', 'laboratory', 'lab', 'diagnostic', 'diagnosis', 'test', 'result', 'report', 'blood', 'hemoglobin', 'wbc', 'rbc', 'platelet', 'glucose', 'cholesterol', 'urea', 'creatinine', 'bilirubin', 'sgpt', 'sgot', 'thyroid', 'tsh', 'hba1c', 'urine', 'prescription', 'medicine', 'tablet', 'dose', 'mg', 'ml', 'temperature', 'pulse', 'bp', 'blood pressure', 'weight', 'height', 'findings', 'impression', 'specimen', 'sample', 'reference', 'normal range', 'date', 'name'];
 const REQUIRED_FIELDS = ['patient', 'age', 'doctor', 'result'];
 const LAB_VALUE_REGEX = /\d+\.?\d*\s*(mg\/dl|g\/dl|mg\/l|mmol\/l|u\/l|iu\/l|ng\/ml|pg\/ml|mmhg|bpm|cells\/mm|cells\/ul|mm\/hr|meq\/l|miu\/ml|nmol\/l|pmol\/l|µg\/dl|ug\/dl)/i;
 const UNIT_REGEX = /\d+\.?\d*\s*(mg\/dl|g\/dl|mg\/l|mmol\/l|u\/l|iu\/l|ng\/ml|pg\/ml|mmhg|bpm|%|fl|pg|miu\/l|units?|cells)/i;
@@ -440,31 +440,31 @@ const validateMedicalReport = async (file) => {
 };
 
 const getReportIcon = (reportType) => {
-  const map = { 'Blood Test Report':'🩸','Diabetes Report':'📊','Lipid Profile Report':'🧪','Thyroid Report':'🦋','Liver Function Report':'🫀','Kidney/Urine Report':'💧','X-Ray Report':'🦴','Imaging Report':'🔬','Prescription':'💊','Discharge Summary':'🏥','Lab Report':'🧬','Cardiology Report':'❤️','Medical Document':'📋','Medical Report (PDF)':'📄' };
+  const map = { 'Blood Test Report': '🩸', 'Diabetes Report': '📊', 'Lipid Profile Report': '🧪', 'Thyroid Report': '🦋', 'Liver Function Report': '🫀', 'Kidney/Urine Report': '💧', 'X-Ray Report': '🦴', 'Imaging Report': '🔬', 'Prescription': '💊', 'Discharge Summary': '🏥', 'Lab Report': '🧬', 'Cardiology Report': '❤️', 'Medical Document': '📋', 'Medical Report (PDF)': '📄' };
   return map[reportType] || '📋';
 };
 
 // ─── AI Health Knowledge Base ─────────────────────────────────────────────────
 const QUICK_QUESTIONS = [
-  { icon: Thermometer,  label: 'Fever & chills',      query: 'I have fever and chills, what should I do?' },
-  { icon: HeartPulse,  label: 'Heart palpitations',   query: 'I am experiencing heart palpitations. What could cause this?' },
-  { icon: Brain,       label: 'Headache & dizziness', query: 'I have a severe headache with dizziness. What could it be?' },
-  { icon: Stethoscope, label: 'Breathing issues',     query: 'I have difficulty breathing and chest tightness. What should I do?' },
-  { icon: FlaskConical,label: 'Blood test results',   query: 'How do I understand my blood test results?' },
-  { icon: PillIcon,    label: 'Medicine interaction', query: 'How can I check if two medicines interact with each other?' },
-  { icon: Activity,    label: 'High BP symptoms',     query: 'What are the symptoms of high blood pressure?' },
-  { icon: Pill,        label: 'Paracetamol info',     query: 'What is paracetamol used for and what is the correct dosage?' },
+  { icon: Thermometer, label: 'Fever & chills', query: 'I have fever and chills, what should I do?' },
+  { icon: HeartPulse, label: 'Heart palpitations', query: 'I am experiencing heart palpitations. What could cause this?' },
+  { icon: Brain, label: 'Headache & dizziness', query: 'I have a severe headache with dizziness. What could it be?' },
+  { icon: Stethoscope, label: 'Breathing issues', query: 'I have difficulty breathing and chest tightness. What should I do?' },
+  { icon: FlaskConical, label: 'Blood test results', query: 'How do I understand my blood test results?' },
+  { icon: PillIcon, label: 'Medicine interaction', query: 'How can I check if two medicines interact with each other?' },
+  { icon: Activity, label: 'High BP symptoms', query: 'What are the symptoms of high blood pressure?' },
+  { icon: Pill, label: 'Paracetamol info', query: 'What is paracetamol used for and what is the correct dosage?' },
 ];
 
 const HEALTH_KB = [
-  { keys: ['fever','chills','temperature','hot','body temperature'], answer: `🌡️ **Fever & Chills**\n\nFever (body temp > 38°C / 100.4°F) is usually your body fighting an infection.\n\n**Common causes:**\n• Viral infections (cold, flu, COVID-19)\n• Bacterial infections\n• Urinary tract infections\n• Malaria or dengue (if you've been in a high-risk area)\n\n**What to do:**\n• Rest and drink plenty of fluids (water, ORS, coconut water)\n• Take paracetamol (500–1000mg every 6–8 hrs) to reduce fever\n• Use a cool, damp cloth on the forehead\n• Wear light clothing\n\n⚠️ **See a doctor immediately if:**\n• Fever > 39.5°C / 103°F\n• Fever lasts more than 3 days\n• You have a rash, stiff neck, or confusion\n• Child under 3 months has any fever` },
-  { keys: ['headache','head pain','migraine','dizziness','dizzy'], answer: `🧠 **Headache & Dizziness**\n\n**Common types:**\n• Tension headache – dull pressure around the head\n• Migraine – throbbing pain, often one-sided\n• Sinus headache – pressure around nose/forehead\n\n**For relief:**\n• Rest in a dark, quiet room\n• Paracetamol or ibuprofen (with food)\n• Stay hydrated\n• Cold or warm compress on the forehead/neck\n\n⚠️ **Emergency signs:**\n• Sudden severe "worst headache of your life"\n• Headache with vision loss, weakness, slurred speech\n• Headache after a head injury` },
-  { keys: ['palpitation','heart racing','fast heartbeat','irregular heartbeat','chest flutter'], answer: `❤️ **Heart Palpitations**\n\n**Common non-serious causes:**\n• Stress, anxiety, or panic attacks\n• Too much caffeine\n• Dehydration\n• Lack of sleep\n\n**What to do:**\n• Sit down, breathe slowly and deeply\n• Drink a glass of cold water\n• Avoid caffeine and stimulants\n\n⚠️ **See a doctor urgently if palpitations come with:**\n• Chest pain or pressure\n• Shortness of breath\n• Fainting or near-fainting` },
-  { keys: ['breathing','breath','shortness','chest tightness','asthma','wheez'], answer: `🫁 **Breathing Difficulty & Chest Tightness**\n\n**Immediate steps:**\n• Sit upright — don't lie flat\n• Breathe slowly through your nose\n• Use your inhaler if you are asthmatic\n• Loosen tight clothing around the chest\n\n⚠️ **Call emergency services (112) immediately if:**\n• You cannot speak in full sentences\n• Lips or fingernails turn blue\n• Sudden severe chest pain` },
-  { keys: ['blood test','cbc','hemoglobin','wbc','rbc','platelet','result','lab report','normal range'], answer: `🧪 **Understanding Blood Test Results**\n\n| Test | Normal Range |\n|------|-------------|\n| Hemoglobin | Men: 13–17 g/dL · Women: 12–15 g/dL |\n| WBC | 4,000–11,000 cells/µL |\n| Platelets | 1.5–4.0 lakh/µL |\n| Fasting Glucose | 70–100 mg/dL |\n| HbA1c | < 5.7% (normal) |\n| Total Cholesterol | < 200 mg/dL |\n| Creatinine | 0.6–1.2 mg/dL |\n| TSH | 0.4–4.0 mIU/L |\n\n💡 Always discuss results with your doctor.` },
-  { keys: ['medicine interaction','drug interaction','two medicines','combine tablet','safe to take'], answer: `💊 **Medicine Interactions**\n\n**Common dangerous combinations:**\n• Aspirin + Warfarin → increased bleeding risk\n• Paracetamol + Alcohol → liver damage\n• Antacids + Iron tablets → reduces iron absorption\n\n**How to check safely:**\n1. Tell your doctor ALL medicines you take\n2. Use verified drug interaction checkers (Drugs.com)\n3. Read the package insert carefully` },
-  { keys: ['blood pressure','hypertension','high bp','bp high','systolic','diastolic'], answer: `💉 **High Blood Pressure**\n\n**Normal BP:** < 120/80 mmHg\n**High (Stage 2):** ≥ 140 / ≥ 90 mmHg\n**Crisis:** > 180 / > 120 mmHg → Emergency!\n\n**Lifestyle management:**\n• Reduce salt intake (< 5g/day)\n• Exercise 30 min, 5 days/week\n• Quit smoking and limit alcohol\n• DASH diet (fruits, vegetables, low-fat dairy)\n\n💊 If prescribed BP medicines, **never stop them suddenly** without doctor's advice.` },
-  { keys: ['paracetamol','crocin','acetaminophen','panadol','fever tablet','pain relief'], answer: `💊 **Paracetamol (Crocin / Tylenol)**\n\n**Standard Adult Dosage:**\n• 500mg–1000mg per dose\n• Every 6–8 hours as needed\n• Maximum: 4000mg (4g) per day\n\n⚠️ Do NOT exceed the daily maximum — overdose causes liver damage\n✅ Can be taken with or without food.` },
+  { keys: ['fever', 'chills', 'temperature', 'hot', 'body temperature'], answer: `🌡️ **Fever & Chills**\n\nFever (body temp > 38°C / 100.4°F) is usually your body fighting an infection.\n\n**Common causes:**\n• Viral infections (cold, flu, COVID-19)\n• Bacterial infections\n• Urinary tract infections\n• Malaria or dengue (if you've been in a high-risk area)\n\n**What to do:**\n• Rest and drink plenty of fluids (water, ORS, coconut water)\n• Take paracetamol (500–1000mg every 6–8 hrs) to reduce fever\n• Use a cool, damp cloth on the forehead\n• Wear light clothing\n\n⚠️ **See a doctor immediately if:**\n• Fever > 39.5°C / 103°F\n• Fever lasts more than 3 days\n• You have a rash, stiff neck, or confusion\n• Child under 3 months has any fever` },
+  { keys: ['headache', 'head pain', 'migraine', 'dizziness', 'dizzy'], answer: `🧠 **Headache & Dizziness**\n\n**Common types:**\n• Tension headache – dull pressure around the head\n• Migraine – throbbing pain, often one-sided\n• Sinus headache – pressure around nose/forehead\n\n**For relief:**\n• Rest in a dark, quiet room\n• Paracetamol or ibuprofen (with food)\n• Stay hydrated\n• Cold or warm compress on the forehead/neck\n\n⚠️ **Emergency signs:**\n• Sudden severe "worst headache of your life"\n• Headache with vision loss, weakness, slurred speech\n• Headache after a head injury` },
+  { keys: ['palpitation', 'heart racing', 'fast heartbeat', 'irregular heartbeat', 'chest flutter'], answer: `❤️ **Heart Palpitations**\n\n**Common non-serious causes:**\n• Stress, anxiety, or panic attacks\n• Too much caffeine\n• Dehydration\n• Lack of sleep\n\n**What to do:**\n• Sit down, breathe slowly and deeply\n• Drink a glass of cold water\n• Avoid caffeine and stimulants\n\n⚠️ **See a doctor urgently if palpitations come with:**\n• Chest pain or pressure\n• Shortness of breath\n• Fainting or near-fainting` },
+  { keys: ['breathing', 'breath', 'shortness', 'chest tightness', 'asthma', 'wheez'], answer: `🫁 **Breathing Difficulty & Chest Tightness**\n\n**Immediate steps:**\n• Sit upright — don't lie flat\n• Breathe slowly through your nose\n• Use your inhaler if you are asthmatic\n• Loosen tight clothing around the chest\n\n⚠️ **Call emergency services (112) immediately if:**\n• You cannot speak in full sentences\n• Lips or fingernails turn blue\n• Sudden severe chest pain` },
+  { keys: ['blood test', 'cbc', 'hemoglobin', 'wbc', 'rbc', 'platelet', 'result', 'lab report', 'normal range'], answer: `🧪 **Understanding Blood Test Results**\n\n| Test | Normal Range |\n|------|-------------|\n| Hemoglobin | Men: 13–17 g/dL · Women: 12–15 g/dL |\n| WBC | 4,000–11,000 cells/µL |\n| Platelets | 1.5–4.0 lakh/µL |\n| Fasting Glucose | 70–100 mg/dL |\n| HbA1c | < 5.7% (normal) |\n| Total Cholesterol | < 200 mg/dL |\n| Creatinine | 0.6–1.2 mg/dL |\n| TSH | 0.4–4.0 mIU/L |\n\n💡 Always discuss results with your doctor.` },
+  { keys: ['medicine interaction', 'drug interaction', 'two medicines', 'combine tablet', 'safe to take'], answer: `💊 **Medicine Interactions**\n\n**Common dangerous combinations:**\n• Aspirin + Warfarin → increased bleeding risk\n• Paracetamol + Alcohol → liver damage\n• Antacids + Iron tablets → reduces iron absorption\n\n**How to check safely:**\n1. Tell your doctor ALL medicines you take\n2. Use verified drug interaction checkers (Drugs.com)\n3. Read the package insert carefully` },
+  { keys: ['blood pressure', 'hypertension', 'high bp', 'bp high', 'systolic', 'diastolic'], answer: `💉 **High Blood Pressure**\n\n**Normal BP:** < 120/80 mmHg\n**High (Stage 2):** ≥ 140 / ≥ 90 mmHg\n**Crisis:** > 180 / > 120 mmHg → Emergency!\n\n**Lifestyle management:**\n• Reduce salt intake (< 5g/day)\n• Exercise 30 min, 5 days/week\n• Quit smoking and limit alcohol\n• DASH diet (fruits, vegetables, low-fat dairy)\n\n💊 If prescribed BP medicines, **never stop them suddenly** without doctor's advice.` },
+  { keys: ['paracetamol', 'crocin', 'acetaminophen', 'panadol', 'fever tablet', 'pain relief'], answer: `💊 **Paracetamol (Crocin / Tylenol)**\n\n**Standard Adult Dosage:**\n• 500mg–1000mg per dose\n• Every 6–8 hours as needed\n• Maximum: 4000mg (4g) per day\n\n⚠️ Do NOT exceed the daily maximum — overdose causes liver damage\n✅ Can be taken with or without food.` },
 ];
 
 const getLocalBotResponse = (query) => {
@@ -509,6 +509,9 @@ const PatientDashboard = () => {
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(true);
   const [backendPredictions, setBackendPredictions] = useState([]);
+  // Password change state
+  const [pwForm, setPwForm] = useState({ current: '', newPw: '', confirm: '' });
+  const [pwSaving, setPwSaving] = useState(false);
   const [pd, setPd] = useState({ name: '', age: '', gender: '', email: '', phone: '', address: '', bloodGroup: '', allergies: '', chronicConditions: '', profilePic: null, height_cm: '', weight_kg: '', bmi: null });
   const [medRecs, setMedRecs] = useState([
     { id: 1, title: 'Blood Test Report', date: '2026-01-15', doctor: 'Dr. Michael Chen', type: 'Lab Report', note: 'Annual health checkup', extractedData: null },
@@ -564,7 +567,7 @@ const PatientDashboard = () => {
     setAiLoading(true);
     try {
       const entities = reportValidation?.entities;
-      const SYMPTOM_MAP = { 'fever': 'fever','high fever': 'fever','temperature': 'fever','cough': 'cough','headache': 'headache','fatigue': 'fatigue','tired': 'fatigue','chest pain': 'chest pain','shortness of breath': 'shortness of breath','breathlessness': 'shortness of breath','nausea': 'nausea','vomiting': 'vomiting','diarrhea': 'diarrhoea','diarrhoea': 'diarrhoea','loose motion': 'diarrhoea','abdominal pain': 'abdominal pain','stomach pain': 'abdominal pain','back pain': 'back or flank pain','joint pain': 'joint pain','muscle pain': 'muscle pain','body ache': 'body aches','skin rash': 'skin rash','rash': 'skin rash','sore throat': 'sore throat','runny nose': 'runny nose','nasal congestion': 'nasal congestion','dizziness': 'dizziness','dizzy': 'dizziness','blurred vision': 'blurred vision','frequent urination': 'frequent urination','excessive thirst': 'increased thirst','weight loss': 'weight loss','loss of appetite': 'loss of appetite','swelling': 'severe oedema (swelling)','jaundice': 'jaundice','sweating': 'sweating','chills': 'chills','anxiety': 'anxiety','depression': 'depression','insomnia': 'sleep disturbance','heart palpitations': 'rapid heartbeat','palpitations': 'rapid heartbeat','hair loss': 'hair loss','numbness': 'tingling and numbness in thumb and fingers','blood in urine': 'blood in urine','pale skin': 'pallor','constipation': 'constipation or diarrhoea','itching': 'skin rash','cold': 'nasal congestion','wheezing': 'wheezing' };
+      const SYMPTOM_MAP = { 'fever': 'fever', 'high fever': 'fever', 'temperature': 'fever', 'cough': 'cough', 'headache': 'headache', 'fatigue': 'fatigue', 'tired': 'fatigue', 'chest pain': 'chest pain', 'shortness of breath': 'shortness of breath', 'breathlessness': 'shortness of breath', 'nausea': 'nausea', 'vomiting': 'vomiting', 'diarrhea': 'diarrhoea', 'diarrhoea': 'diarrhoea', 'loose motion': 'diarrhoea', 'abdominal pain': 'abdominal pain', 'stomach pain': 'abdominal pain', 'back pain': 'back or flank pain', 'joint pain': 'joint pain', 'muscle pain': 'muscle pain', 'body ache': 'body aches', 'skin rash': 'skin rash', 'rash': 'skin rash', 'sore throat': 'sore throat', 'runny nose': 'runny nose', 'nasal congestion': 'nasal congestion', 'dizziness': 'dizziness', 'dizzy': 'dizziness', 'blurred vision': 'blurred vision', 'frequent urination': 'frequent urination', 'excessive thirst': 'increased thirst', 'weight loss': 'weight loss', 'loss of appetite': 'loss of appetite', 'swelling': 'severe oedema (swelling)', 'jaundice': 'jaundice', 'sweating': 'sweating', 'chills': 'chills', 'anxiety': 'anxiety', 'depression': 'depression', 'insomnia': 'sleep disturbance', 'heart palpitations': 'rapid heartbeat', 'palpitations': 'rapid heartbeat', 'hair loss': 'hair loss', 'numbness': 'tingling and numbness in thumb and fingers', 'blood in urine': 'blood in urine', 'pale skin': 'pallor', 'constipation': 'constipation or diarrhoea', 'itching': 'skin rash', 'cold': 'nasal congestion', 'wheezing': 'wheezing' };
       const inputText = symptoms.trim().toLowerCase();
       const detectedSymptoms = new Set();
       for (const [phrase, vocabTerm] of Object.entries(SYMPTOM_MAP)) { if (inputText.includes(phrase)) detectedSymptoms.add(vocabTerm); }
@@ -577,7 +580,7 @@ const PatientDashboard = () => {
       const bpString = bpMatch ? `${bpMatch[1]}/${bpMatch[2]}` : '120/80';
       const tempMatch = inputText.match(/(\d{2,3}(?:\.\d)?)\s*(?:°c|°f|c\b|f\b|celsius|fahrenheit|degrees)/i);
       let temperature = 98.6;
-      if (tempMatch) { const t = parseFloat(tempMatch[1]); temperature = t > 50 ? t : t * 9/5 + 32; }
+      if (tempMatch) { const t = parseFloat(tempMatch[1]); temperature = t > 50 ? t : t * 9 / 5 + 32; }
       else if (/fever|high temperature/i.test(inputText)) temperature = 101.0;
       const result = await runPrediction({ age: pd.age || 30, temperature, blood_pressure: bpString, has_diabetes: entities?.diagnoses?.some(d => /diabet/i.test(d)) || /diabet/i.test(inputText) || false, has_hypertension: entities?.diagnoses?.some(d => /hypertension/i.test(d)) || /hypert|high bp|high blood pressure/i.test(inputText) || false, symptoms: finalSymptoms });
       const now = new Date();
@@ -610,7 +613,7 @@ const PatientDashboard = () => {
       }
       warnings.push(`AI confidence: ${confidence.toFixed(0)}% — always confirm with a licensed physician`);
       if (entities?.testResults?.length > 0) {
-        const abnormal = entities.testResults.filter(r => ['H','L','HIGH','LOW','ABNORMAL','CRITICAL'].includes(r.flag?.toUpperCase()));
+        const abnormal = entities.testResults.filter(r => ['H', 'L', 'HIGH', 'LOW', 'ABNORMAL', 'CRITICAL'].includes(r.flag?.toUpperCase()));
         if (abnormal.length > 0) {
           warnings.push(`Abnormal values in your report: ${abnormal.map(r => `${r.name} (${r.value}${r.unit ? ' ' + r.unit : ''}) — ${r.flag}`).join(', ')}`);
         }
@@ -647,6 +650,21 @@ const PatientDashboard = () => {
     const f = e.target.files[0]; if (!f) return;
     const r = new FileReader(); r.onloadend = () => setPd(p => ({ ...p, profilePic: r.result })); r.readAsDataURL(f);
     try { const formData = new FormData(); formData.append('file', f); await updateProfilePicture(formData); } catch (err) { console.error('Profile picture upload failed:', err.message); }
+  };
+
+  const handlePasswordChange = async () => {
+    if (!pwForm.current) { showToast('Enter your current password', 'error'); return; }
+    if (!pwForm.newPw) { showToast('Enter a new password', 'error'); return; }
+    if (pwForm.newPw.length < 8) { showToast('New password must be at least 8 characters', 'error'); return; }
+    if (pwForm.newPw !== pwForm.confirm) { showToast('New passwords do not match', 'error'); return; }
+    setPwSaving(true);
+    try {
+      await api.post('/patient/change-password', { current_password: pwForm.current, new_password: pwForm.newPw });
+      showToast('✅ Password changed successfully!', 'success');
+      setPwForm({ current: '', newPw: '', confirm: '' });
+    } catch (err) {
+      showToast(err.response?.data?.detail || err.message || 'Password change failed', 'error');
+    } finally { setPwSaving(false); }
   };
 
   const handleMedicalRecordUpload = async (e) => {
@@ -832,7 +850,7 @@ Generated by Medi AI © ${new Date().getFullYear()}
         {!editingProfile
           ? <Btn onClick={() => setEditingProfile(true)} icon={Edit}>Edit Profile</Btn>
           : <div style={{ display: 'flex', gap: 8 }}>
-            <Btn onClick={async () => { try { await updatePatientProfile({ name: pd.name, age: pd.age, gender: pd.gender, phone: pd.phone, address: pd.address, blood_group: pd.bloodGroup, height_cm: pd.height_cm || undefined, weight_kg: pd.weight_kg || undefined }); setEditingProfile(false); alert('Profile updated!'); } catch (err) { alert('Update failed: ' + err.message); } }} icon={Save}>Save Changes</Btn>
+            <Btn onClick={async () => { try { await updatePatientProfile({ name: pd.name, age: pd.age, gender: pd.gender, phone: pd.phone, address: pd.address, blood_group: pd.bloodGroup, height_cm: pd.height_cm || undefined, weight_kg: pd.weight_kg || undefined }); setEditingProfile(false); showToast('Profile updated!', 'success'); } catch (err) { showToast('Update failed: ' + err.message, 'error'); } }} icon={Save}>Save Changes</Btn>
             <Btn onClick={() => setEditingProfile(false)} variant="secondary">Cancel</Btn>
           </div>}
       </div>
@@ -846,12 +864,85 @@ Generated by Medi AI © ${new Date().getFullYear()}
           <div style={{ fontSize: 20, fontWeight: 800, color: T.text, marginTop: 12 }}>{pd.name}</div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 16 }}>
-          {[{ label: 'Full Name', key: 'name', type: 'text' },{ label: 'Age', key: 'age', type: 'number' },{ label: 'Email', key: 'email', type: 'email' },{ label: 'Phone', key: 'phone', type: 'tel' },{ label: 'Blood Group', key: 'bloodGroup', type: 'text' },{ label: 'Address', key: 'address', type: 'text' },{ label: 'Allergies', key: 'allergies', type: 'text' },{ label: 'Chronic Conditions', key: 'chronicConditions', type: 'text' }].map(f => (
+          {[{ label: 'Full Name', key: 'name', type: 'text' }, { label: 'Age', key: 'age', type: 'number' }, { label: 'Email', key: 'email', type: 'email' }, { label: 'Phone', key: 'phone', type: 'tel' }, { label: 'Blood Group', key: 'bloodGroup', type: 'text' }, { label: 'Address', key: 'address', type: 'text' }, { label: 'Allergies', key: 'allergies', type: 'text' }, { label: 'Chronic Conditions', key: 'chronicConditions', type: 'text' }].map(f => (
             <div key={f.key}>
               <label style={fieldLabel}>{f.label}</label>
               <input type={f.type} value={pd[f.key]} disabled={!editingProfile} onChange={e => setPd(p => ({ ...p, [f.key]: f.type === 'number' ? parseInt(e.target.value) || 0 : e.target.value }))} style={{ ...fieldInput, opacity: editingProfile ? 1 : 0.55 }} />
             </div>
           ))}
+        </div>
+      </Card>
+
+      {/* ── Change Password ── */}
+      <Card>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: `${T.cyan}18`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Lock size={18} color={T.cyan} />
+          </div>
+          <div>
+            <div style={{ fontWeight: 700, color: T.text, fontSize: 15 }}>Change Password</div>
+            <div style={{ fontSize: 12, color: T.muted }}>Update your account password</div>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', background: `${T.cyan}0d`, border: `1px solid ${T.cyan}25`, borderRadius: 8, marginBottom: 18 }}>
+          <Lock size={13} color={T.cyan} />
+          <span style={{ fontSize: 12, color: T.sub }}>Password must be at least 8 characters long</span>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: 16, maxWidth: 600 }}>
+          {[
+            { label: 'Current Password', field: 'current', placeholder: 'Enter your current password' },
+            { label: 'New Password', field: 'newPw', placeholder: 'Enter new password (min 8 chars)' },
+            { label: 'Confirm New Password', field: 'confirm', placeholder: 'Re-enter your new password' },
+          ].map(({ label, field, placeholder }) => (
+            <div key={field}>
+              <label style={fieldLabel}>{label}</label>
+              <input
+                type="password"
+                placeholder={placeholder}
+                value={pwForm[field]}
+                onChange={e => setPwForm(f => ({ ...f, [field]: e.target.value }))}
+                onKeyDown={e => e.key === 'Enter' && handlePasswordChange()}
+                style={{
+                  ...fieldInput,
+                  borderColor: field === 'confirm' && pwForm.confirm && pwForm.newPw !== pwForm.confirm
+                    ? T.red
+                    : 'rgba(0,153,204,0.2)',
+                }}
+                onFocus={e => e.target.style.borderColor = T.cyan}
+                onBlur={e => e.target.style.borderColor = (field === 'confirm' && pwForm.confirm && pwForm.newPw !== pwForm.confirm) ? T.red : 'rgba(0,153,204,0.2)'}
+              />
+              {field === 'confirm' && pwForm.confirm && pwForm.newPw !== pwForm.confirm && (
+                <div style={{ fontSize: 11, color: T.red, marginTop: 4 }}>Passwords do not match</div>
+              )}
+              {field === 'confirm' && pwForm.confirm && pwForm.newPw === pwForm.confirm && pwForm.confirm.length > 0 && (
+                <div style={{ fontSize: 11, color: T.green, marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <CheckCircle size={11} /> Passwords match
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div style={{ marginTop: 20 }}>
+          <button
+            onClick={handlePasswordChange}
+            disabled={pwSaving}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              padding: '10px 24px', borderRadius: 10,
+              background: pwSaving ? T.muted : `linear-gradient(135deg, ${T.green}, #059669)`,
+              color: '#fff', border: 'none', fontWeight: 700, fontSize: 14,
+              cursor: pwSaving ? 'not-allowed' : 'pointer',
+              fontFamily: 'inherit', transition: 'all 0.2s',
+            }}
+          >
+            {pwSaving
+              ? <><RefreshCw size={14} style={{ animation: 'spin 1s linear infinite' }} /> Updating…</>
+              : <><CheckCircle size={14} /> Update Password</>
+            }
+          </button>
         </div>
       </Card>
     </div>
@@ -1011,7 +1102,7 @@ Generated by Medi AI © ${new Date().getFullYear()}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                       {rec.medicationsRich.slice(0, 5).map((med, mi) => {
                         const sevColor = { Mild: T.green, Moderate: T.amber, Severe: T.red, Critical: '#ff2200' }[med.severity] || T.muted;
-                        const sevIcon  = { Mild: '🟢', Moderate: '🟡', Severe: '🟠', Critical: '🔴' }[med.severity] || '⚪';
+                        const sevIcon = { Mild: '🟢', Moderate: '🟡', Severe: '🟠', Critical: '🔴' }[med.severity] || '⚪';
                         return (
                           <div key={mi} style={{ padding: 14, background: `${T.purple}06`, border: `1px solid ${T.purple}15`, borderRadius: 12 }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8, gap: 8 }}>
@@ -1078,7 +1169,7 @@ Generated by Medi AI © ${new Date().getFullYear()}
                       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
                         <thead>
                           <tr style={{ borderBottom: `1px solid ${T.border}` }}>
-                            {['Test Name','Value','Unit','Normal Range','Flag'].map(h => (
+                            {['Test Name', 'Value', 'Unit', 'Normal Range', 'Flag'].map(h => (
                               <th key={h} style={{ textAlign: 'left', padding: '6px 10px', color: T.muted, fontWeight: 600 }}>{h}</th>
                             ))}
                           </tr>
@@ -1092,9 +1183,11 @@ Generated by Medi AI © ${new Date().getFullYear()}
                               <td style={{ padding: '6px 10px', color: T.muted }}>{r.range || '—'}</td>
                               <td style={{ padding: '6px 10px' }}>
                                 {r.flag && r.flag !== 'NORMAL' && r.flag !== ''
-                                  ? <span style={{ padding: '2px 8px', borderRadius: 99, fontSize: 10, fontWeight: 700,
-                                      background: (r.flag === 'H' || r.flag === 'HIGH' || r.flag === 'CRITICAL') ? `${T.red}20` : (r.flag === 'L' || r.flag === 'LOW') ? `${T.amber}20` : `${T.border}`,
-                                      color: (r.flag === 'H' || r.flag === 'HIGH' || r.flag === 'CRITICAL') ? T.red : (r.flag === 'L' || r.flag === 'LOW') ? T.amber : T.muted }}>{r.flag}</span>
+                                  ? <span style={{
+                                    padding: '2px 8px', borderRadius: 99, fontSize: 10, fontWeight: 700,
+                                    background: (r.flag === 'H' || r.flag === 'HIGH' || r.flag === 'CRITICAL') ? `${T.red}20` : (r.flag === 'L' || r.flag === 'LOW') ? `${T.amber}20` : `${T.border}`,
+                                    color: (r.flag === 'H' || r.flag === 'HIGH' || r.flag === 'CRITICAL') ? T.red : (r.flag === 'L' || r.flag === 'LOW') ? T.amber : T.muted
+                                  }}>{r.flag}</span>
                                   : <span style={{ color: T.green, fontSize: 11 }}>Normal</span>
                                 }
                               </td>
@@ -1192,11 +1285,13 @@ Generated by Medi AI © ${new Date().getFullYear()}
                 rows={1}
                 style={{ flex: 1, background: 'transparent', border: 'none', color: T.text, fontSize: 14, outline: 'none', resize: 'none', lineHeight: 1.5, maxHeight: 120, minHeight: 42, overflow: 'auto', fontFamily: 'inherit', padding: '10px 0' }} />
               <button onClick={generateAI} disabled={(!symptoms.trim() && !aiFile) || aiLoading || uploadingReport}
-                style={{ width: 42, height: 42, borderRadius: 12, border: 'none',
+                style={{
+                  width: 42, height: 42, borderRadius: 12, border: 'none',
                   cursor: (symptoms.trim() || aiFile) && !aiLoading && !uploadingReport ? 'pointer' : 'not-allowed',
                   background: (symptoms.trim() || aiFile) && !aiLoading && !uploadingReport ? `linear-gradient(135deg,${T.cyan},#0066aa)` : T.surface,
                   display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                  opacity: (symptoms.trim() || aiFile) && !aiLoading && !uploadingReport ? 1 : 0.5 }}>
+                  opacity: (symptoms.trim() || aiFile) && !aiLoading && !uploadingReport ? 1 : 0.5
+                }}>
                 {aiLoading
                   ? <div style={{ width: 18, height: 18, borderRadius: '50%', border: `2px solid #fff`, borderTopColor: 'transparent', animation: 'spin 0.6s linear infinite' }} />
                   : <Send size={18} color={(symptoms.trim() || aiFile) ? '#fff' : T.muted} />
@@ -1225,7 +1320,7 @@ Generated by Medi AI © ${new Date().getFullYear()}
   const renderPrescriptions = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
       <h1 style={{ color: T.text, fontWeight: 800, fontSize: 26, margin: 0 }}>Prescriptions</h1>
-      {[{ title: '💊 Current Prescriptions', data: prescriptions.current },{ title: '🗂 Past Prescriptions', data: prescriptions.past }].map((sec, si) => (
+      {[{ title: '💊 Current Prescriptions', data: prescriptions.current }, { title: '🗂 Past Prescriptions', data: prescriptions.past }].map((sec, si) => (
         <Card key={si}>
           <div style={{ fontWeight: 700, color: T.text, fontSize: 15, marginBottom: 14 }}>{sec.title}</div>
           {sec.data.length === 0 ? <div style={{ color: T.muted, fontSize: 13, textAlign: 'center', padding: '24px 0' }}>No prescriptions found</div> : (
@@ -1320,7 +1415,7 @@ Generated by Medi AI © ${new Date().getFullYear()}
                 <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end' }}>
                   <div style={{ width: 32, height: 32, borderRadius: '50%', flexShrink: 0, background: `linear-gradient(135deg, ${T.cyan}, #005599)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Brain size={14} color="#fff" /></div>
                   <div style={{ padding: '12px 16px', borderRadius: '4px 16px 16px 16px', background: T.cyanDim, border: `1px solid ${T.border}`, display: 'flex', gap: 5, alignItems: 'center' }}>
-                    {[0,1,2].map(i => <div key={i} style={{ width: 7, height: 7, borderRadius: '50%', background: T.cyan, animation: `botPulse 1.4s ease-in-out ${i * 0.2}s infinite` }} />)}
+                    {[0, 1, 2].map(i => <div key={i} style={{ width: 7, height: 7, borderRadius: '50%', background: T.cyan, animation: `botPulse 1.4s ease-in-out ${i * 0.2}s infinite` }} />)}
                   </div>
                 </div>
               )}
@@ -1512,8 +1607,8 @@ Generated by Medi AI © ${new Date().getFullYear()}
     if (!showPlans) return null;
     const s = subInfo;
     const plans = [
-      { key: 'basic',   price: '₹299', color: T.cyan,  label: 'Basic',   queries: '10 queries/mo',  trial: '7-day free trial'  },
-      { key: 'premium', price: '₹999', color: T.green, label: 'Premium', queries: 'Unlimited',      trial: '14-day free trial' },
+      { key: 'basic', price: '₹299', color: T.cyan, label: 'Basic', queries: '10 queries/mo', trial: '7-day free trial' },
+      { key: 'premium', price: '₹999', color: T.green, label: 'Premium', queries: 'Unlimited', trial: '14-day free trial' },
     ];
     return (
       <div onClick={() => setShowPlans(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: 16 }}>
@@ -1585,7 +1680,7 @@ Generated by Medi AI © ${new Date().getFullYear()}
             <button onClick={() => setShareMenu(o => !o)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 13px', background: T.cyanDim, border: `1px solid ${T.border}`, borderRadius: 9, color: T.cyan, cursor: 'pointer', fontSize: 12, fontWeight: 600 }}><Share2 size={13} /> Share</button>
             {shareMenu && (
               <div style={{ position: 'absolute', right: 0, top: '110%', width: 210, background: T.card, border: `1px solid ${T.border}`, borderRadius: 12, overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.5)', zIndex: 200 }}>
-                {[{ icon: Copy, label: 'Copy link', fn: () => { navigator.clipboard.writeText(window.location.href); setShareMenu(false); } },{ icon: Download, label: 'Download chat', fn: () => { alert('Coming soon!'); setShareMenu(false); } },{ icon: Smartphone, label: 'Share to WhatsApp', fn: () => { window.open(`https://wa.me/?text=${encodeURIComponent(window.location.href)}`, '_blank'); setShareMenu(false); } }].map((item, i) => (<button key={i} onClick={item.fn} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: 'none', border: 'none', color: T.sub, cursor: 'pointer', fontSize: 12, textAlign: 'left' }}><item.icon size={13} color={T.cyan} /> {item.label}</button>))}
+                {[{ icon: Copy, label: 'Copy link', fn: () => { navigator.clipboard.writeText(window.location.href); setShareMenu(false); } }, { icon: Download, label: 'Download chat', fn: () => { alert('Coming soon!'); setShareMenu(false); } }, { icon: Smartphone, label: 'Share to WhatsApp', fn: () => { window.open(`https://wa.me/?text=${encodeURIComponent(window.location.href)}`, '_blank'); setShareMenu(false); } }].map((item, i) => (<button key={i} onClick={item.fn} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: 'none', border: 'none', color: T.sub, cursor: 'pointer', fontSize: 12, textAlign: 'left' }}><item.icon size={13} color={T.cyan} /> {item.label}</button>))}
               </div>
             )}
           </div>
@@ -1626,13 +1721,13 @@ Generated by Medi AI © ${new Date().getFullYear()}
       {/* MAIN */}
       <main style={{ marginLeft: sidebarOpen ? 240 : 0, marginTop: 58, minHeight: 'calc(100vh - 58px)', transition: 'margin-left 0.25s ease', display: 'flex', flexDirection: 'column' }}>
         <div style={{ flex: 1, padding: 22, maxWidth: 1160, width: '100%', margin: '0 auto', boxSizing: 'border-box' }}>
-          {page === 'Dashboard'                       && renderDashboard()}
-          {page === 'My Profile'                      && renderProfile()}
-          {page === 'Medical Records'                 && renderMedicalRecords()}
-          {page === 'AI Treatment Recommendation'     && renderAiTreatment()}
-          {page === 'Prescriptions'                   && renderPrescriptions()}
-          {page === 'Messages / Notifications'        && renderMessages()}
-          {page === 'Subscription'                    && renderSubscription()}
+          {page === 'Dashboard' && renderDashboard()}
+          {page === 'My Profile' && renderProfile()}
+          {page === 'Medical Records' && renderMedicalRecords()}
+          {page === 'AI Treatment Recommendation' && renderAiTreatment()}
+          {page === 'Prescriptions' && renderPrescriptions()}
+          {page === 'Messages / Notifications' && renderMessages()}
+          {page === 'Subscription' && renderSubscription()}
         </div>
         {page !== 'AI Treatment Recommendation' && (
           <footer style={{ borderTop: `1px solid ${T.border}`, padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10, background: T.surface }}>
