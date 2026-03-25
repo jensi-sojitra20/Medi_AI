@@ -109,32 +109,6 @@ export const markNotificationsRead = async () => {
   return res.data;
 };
 
-export const changePatientPassword = async (currentPassword, newPassword) => {
-  const res = await api.post('/patient/change-password', {
-    current_password: currentPassword,
-    new_password: newPassword,
-  });
-  return res.data;
-};
-
-export const getDoctorNotifications = async () => {
-  const res = await api.get('/doctor/notifications');
-  return res.data;
-};
-
-export const markDoctorNotificationsRead = async () => {
-  const res = await api.post('/doctor/notifications/mark-read');
-  return res.data;
-};
-
-export const changeDoctorPassword = async (currentPassword, newPassword) => {
-  const res = await api.post('/doctor/change-password', {
-    current_password: currentPassword,
-    new_password: newPassword,
-  });
-  return res.data;
-};
-
 export const getSubscription = async () => {
   const res = await api.get('/patient/subscription');
   return res.data;
