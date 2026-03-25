@@ -5,8 +5,6 @@ import { GoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import MediAiLogo from "../components/MediAiLogo";
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-
 const Login = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState('role');
@@ -55,7 +53,7 @@ const Login = () => {
         patient: 'PATIENT'
       };
 
-      const response = await axios.post(`${BASE_URL}/auth/login`, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/auth/login`, {
         email: email,
         password: password,
         role: roleMap[selectedRole.id]
@@ -86,7 +84,7 @@ const Login = () => {
     setError("");
     setLoading(true);
 
-    const res = await axios.post(`${BASE_URL}/auth/google`, {
+    const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/auth/google`, {
       token: credentialResponse.credential,
       role: selectedRole?.id,  // ✅ Keep lowercase: "doctor", "patient" — NOT roleMap
     });
@@ -126,7 +124,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${BASE_URL}/auth/forgot-password`, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/auth/forgot-password`, {
         email: resetEmail
       });
 
@@ -155,7 +153,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${BASE_URL}/auth/verify-otp`, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/auth/verify-otp`, {
         email: resetEmail,
         otp: otpString
       });
@@ -190,7 +188,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${BASE_URL}/auth/reset-password`, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/auth/reset-password`, {
         email: resetEmail,
         otp: otp.join(''),
         newPassword: newPassword
@@ -224,7 +222,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${BASE_URL}/auth/forgot-password`, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/auth/forgot-password`, {
         email: resetEmail
       });
 
