@@ -4,14 +4,14 @@ import {
   Users, Calendar, FileText, Activity, LogOut, Stethoscope, AlertCircle, CheckCircle2,
   Clock, Search, RefreshCw, Eye, X, Edit, Download, Share2, Settings, HelpCircle,
   MessageSquare, ChevronDown, Filter, Check, XCircle, User, Mail, Phone, MapPin,
-  Calendar as CalendarIcon, Save, Camera, Bell, Lock, Check, Palette, BookOpen, FileQuestion,
+  Calendar as CalendarIcon, Save, Camera, Bell, Lock, Palette, BookOpen, FileQuestion,
   MessageCircle, Copy, Facebook, Twitter, Linkedin
 } from 'lucide-react';
 import MediAiLogo from '../components/MediAiLogo';
 import DoctorFeedbackForm from '../components/DoctorFeedbackSection';
 
 // ── API Helper ────────────────────────────────────────────────────────────────
-const BASE = 'http://localhost:8000';
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 const apiFetch = async (path, opts = {}) => {
   const token = localStorage.getItem('token');
   const res = await fetch(`${BASE}${path}`, {
@@ -100,8 +100,6 @@ const DoctorDashboard = () => {
   });
 
   // ── PROFILE DATA: Load from localStorage on mount ─────────────────────────
-  // This ensures that on every login, saved profile data (including avatar)
-  // is immediately restored from localStorage before any API call runs.
   const [profileData, setProfileData] = useState(() => {
     const stored = loadProfileFromLocalStorage();
     return {
@@ -115,7 +113,7 @@ const DoctorDashboard = () => {
       qualification: stored.qualification || '',
       status: stored.status || 'PENDING',
       verified: stored.verified || false,
-      avatar: stored.avatar || null, // ✅ Avatar loaded immediately from localStorage
+      avatar: stored.avatar || null,
     };
   });
 
@@ -159,27 +157,20 @@ const DoctorDashboard = () => {
     setTimeout(() => setShowNotification(false), 3000);
   };
 
-  // ── Update profile: saves to BOTH React state and localStorage atomically ──
+  // ── Update profile ──────────────────────────────────────────────────────────
   const updateProfile = useCallback((data) => {
     saveProfileToLocalStorage(data);
     setProfileData(prev => ({ ...prev, ...data }));
   }, []);
 
-  // ── BUG FIX: loadDashboard reads localStorage FRESH inside the callback ────
-  // Previously it closed over `profileData` state which was stale at mount
-  // time (empty strings), causing avatar and locally-edited fields to be lost.
-  // Now we call loadProfileFromLocalStorage() directly so we always get the
-  // latest persisted values — no stale closure possible.
   const loadDashboard = useCallback(async () => {
     try {
       const data = await apiFetch('/doctor/dashboard');
 
       if (data.doctor) {
-        // Read from localStorage for fallback
         const stored = loadProfileFromLocalStorage();
 
         updateProfile({
-          // Server-authoritative fields
           name: data.doctor.name || stored.name || '',
           email: data.doctor.email || stored.email || '',
           phone: data.doctor.phone || stored.phone || '',
@@ -190,7 +181,6 @@ const DoctorDashboard = () => {
           qualification: data.doctor.qualification || stored.qualification || '',
           status: data.doctor.status || stored.status || 'PENDING',
           verified: String(data.doctor.status || '').toUpperCase() === 'VERIFIED',
-          // ✅ Use server profile_image_url if available, else fallback to localStorage
           avatar: data.doctor.profile_image_url || stored.avatar || null,
         });
       }
@@ -199,7 +189,7 @@ const DoctorDashboard = () => {
     } catch (err) {
       if (err.message.includes('401') || err.message.includes('403')) navigate('/login');
     }
-  }, [navigate, updateProfile]); // ✅ FIX: profileData removed from deps
+  }, [navigate, updateProfile]);
 
   const loadPending = useCallback(async () => {
     try {
@@ -246,8 +236,6 @@ const DoctorDashboard = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userRole');
     localStorage.removeItem('userEmail');
-    // ✅ INTENTIONALLY keep 'doctor_profile' in localStorage
-    // This is what makes profile persist across login sessions
     showSuccessNotification('Logged out successfully');
     setTimeout(() => navigate('/login'), 1000);
   };
@@ -417,7 +405,7 @@ Date: ${new Date().toLocaleDateString()}
     }, 1500);
   };
 
-  // ── Save Profile to API + localStorage ──────────────────────────────────
+  // ── Save Profile ──────────────────────────────────────────────────────────
   const handleSaveProfile = async () => {
     setLoading(true);
     try {
@@ -434,7 +422,6 @@ Date: ${new Date().toLocaleDateString()}
         }),
       });
 
-      // ✅ Persist full profile to localStorage including avatar
       updateProfile({
         name: res.doctor?.name || profileData.name,
         email: res.doctor?.email || profileData.email,
@@ -446,7 +433,7 @@ Date: ${new Date().toLocaleDateString()}
         licenseId: profileData.licenseId,
         status: profileData.status,
         verified: profileData.verified,
-        avatar: profileData.avatar, // ✅ Always persist avatar
+        avatar: profileData.avatar,
       });
 
       showSuccessNotification('✅ Profile updated successfully!');
@@ -479,15 +466,13 @@ Date: ${new Date().toLocaleDateString()}
     } catch { }
   }, []);
 
-  // Close bell panel on outside click
   useEffect(() => {
     const handler = (e) => { if (bellRef.current && !bellRef.current.contains(e.target)) setBellOpen(false); };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  // Initial bell load
-  useEffect(() => { loadBellNotifs(); }, []); // eslint-disable-line
+  useEffect(() => { loadBellNotifs(); }, []);
 
   const bellUnread = bellNotifs.filter(n => !n.is_read).length;
 
@@ -544,7 +529,7 @@ Date: ${new Date().toLocaleDateString()}
     showSuccessNotification('✅ Data refreshed successfully!');
   };
 
-  // ── Avatar Upload — saves to uploads/doctors/images/ on backend ─────────
+  // ── Avatar Upload ─────────────────────────────────────────────────────────
   const handleAvatarUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -555,17 +540,16 @@ Date: ${new Date().toLocaleDateString()}
       return;
     }
 
-    // Show instant preview from local file
     const reader = new FileReader();
     reader.onloadend = () => updateProfile({ avatar: reader.result });
     reader.readAsDataURL(file);
 
-    // Upload to backend → saved to uploads/doctors/images/
     try {
       const token = localStorage.getItem('token');
       const formData = new FormData();
       formData.append('file', file);
-      const res = await fetch('http://localhost:8000/doctor/profile/picture', {
+      // ✅ FIXED: Using VITE_API_URL instead of hardcoded localhost
+      const res = await fetch(`${BASE}/doctor/profile/picture`, {
         method: 'POST',
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         body: formData,
@@ -575,7 +559,6 @@ Date: ${new Date().toLocaleDateString()}
         throw new Error(err.detail || `HTTP ${res.status}`);
       }
       const data = await res.json();
-      // Store real server URL so it persists after page refresh
       updateProfile({ avatar: data.profile_image_url });
       showSuccessNotification('📷 Profile picture saved to server!');
     } catch (err) {
@@ -694,8 +677,7 @@ Date: ${new Date().toLocaleDateString()}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm">
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${patient.pending_reports > 0 ? 'bg-yellow-500/20 text-yellow-400' : 'bg-gray-500/20 text-gray-400'
-                        }`}>
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${patient.pending_reports > 0 ? 'bg-yellow-500/20 text-yellow-400' : 'bg-gray-500/20 text-gray-400'}`}>
                         {patient.pending_reports || 0} pending
                       </span>
                     </td>
@@ -769,8 +751,7 @@ Date: ${new Date().toLocaleDateString()}
                     <td className="px-6 py-4 text-sm text-gray-300">{patient.gender || '—'}</td>
                     <td className="px-6 py-4 text-sm text-gray-300">{patient.last_disease || '—'}</td>
                     <td className="px-6 py-4 text-sm">
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${String(patient.subscription).toUpperCase() === 'ACTIVE' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-                        }`}>{patient.subscription || '—'}</span>
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${String(patient.subscription).toUpperCase() === 'ACTIVE' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>{patient.subscription || '—'}</span>
                     </td>
                     <td className="px-6 py-4">
                       <button onClick={() => handleViewPatient(patient)} className="text-brand-cyan hover:text-brand-blue transition-colors flex items-center gap-1">
@@ -817,22 +798,10 @@ Date: ${new Date().toLocaleDateString()}
                         <span className="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-xs font-semibold">Pending Review</span>
                       </div>
                       <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <span className="text-gray-400">Patient ID:</span>
-                          <span className="text-white ml-2">#{report.patient_id}</span>
-                        </div>
-                        <div>
-                          <span className="text-gray-400">AI Prediction:</span>
-                          <span className="text-white ml-2">{report.disease || '—'}</span>
-                        </div>
-                        <div>
-                          <span className="text-gray-400">Confidence:</span>
-                          <span className="text-white ml-2">{report.confidence != null ? `${Math.round(report.confidence * 100)}%` : '—'}</span>
-                        </div>
-                        <div>
-                          <span className="text-gray-400">Severity:</span>
-                          <span className="text-white ml-2">{report.severity || '—'}</span>
-                        </div>
+                        <div><span className="text-gray-400">Patient ID:</span><span className="text-white ml-2">#{report.patient_id}</span></div>
+                        <div><span className="text-gray-400">AI Prediction:</span><span className="text-white ml-2">{report.disease || '—'}</span></div>
+                        <div><span className="text-gray-400">Confidence:</span><span className="text-white ml-2">{report.confidence != null ? `${Math.round(report.confidence * 100)}%` : '—'}</span></div>
+                        <div><span className="text-gray-400">Severity:</span><span className="text-white ml-2">{report.severity || '—'}</span></div>
                       </div>
                     </div>
                     <button onClick={() => handleReviewReport(report)} className="px-6 py-3 bg-gradient-to-r from-brand-blue to-brand-cyan text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-brand-blue/30 transition-all hover:scale-105">
@@ -862,8 +831,7 @@ Date: ${new Date().toLocaleDateString()}
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                           <h4 className="text-lg font-semibold text-white">{report.patient_name}</h4>
-                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${report.status === 'APPROVED' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-                            }`}>{report.status}</span>
+                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${report.status === 'APPROVED' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>{report.status}</span>
                           {report.has_prescription && (
                             <span className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs font-semibold">Prescribed</span>
                           )}
@@ -965,8 +933,7 @@ Date: ${new Date().toLocaleDateString()}
           <div>
             <p className="text-white font-semibold">{profileData.name}</p>
             <p className="text-gray-400 text-sm">{profileData.specialization}</p>
-            <span className={`mt-1 inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${isVerified ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'
-              }`}>{isVerified ? '✓ Verified' : `⏳ ${profileData.status}`}</span>
+            <span className={`mt-1 inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${isVerified ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>{isVerified ? '✓ Verified' : `⏳ ${profileData.status}`}</span>
           </div>
         </div>
       </div>
@@ -1028,7 +995,6 @@ Date: ${new Date().toLocaleDateString()}
         </button>
       </div>
 
-      {/* ── Change Password ── */}
       <div className="bg-dark-card border border-dark-border rounded-xl p-6">
         <div className="flex items-center gap-2 mb-5">
           <Lock className="w-5 h-5 text-brand-blue" />
@@ -1076,7 +1042,6 @@ Date: ${new Date().toLocaleDateString()}
 
   return (
     <div className="min-h-screen bg-dark-bg flex">
-      {/* Notification Toast */}
       {showNotification && (
         <div className="fixed top-4 right-4 z-50 animate-fade-in-up">
           <div className={`px-6 py-4 rounded-lg shadow-lg border flex items-center gap-3 ${notificationMessage.type === 'success' ? 'bg-green-500/20 border-green-500/50 text-green-400' :
@@ -1091,7 +1056,6 @@ Date: ${new Date().toLocaleDateString()}
         </div>
       )}
 
-      {/* Sidebar */}
       <div className="w-64 bg-dark-card border-r border-dark-border flex flex-col">
         <div className="p-6 border-b border-dark-border">
           <div className="flex items-center space-x-3">
@@ -1105,12 +1069,10 @@ Date: ${new Date().toLocaleDateString()}
 
         <nav className="flex-1 p-4 space-y-2">
           <button onClick={() => setCurrentPage('dashboard')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${currentPage === 'dashboard' ? 'bg-gradient-to-r from-brand-blue to-brand-cyan text-white shadow-lg' : 'text-gray-400 hover:bg-dark-bg hover:text-white'}`}>
-            <Activity className="w-5 h-5" />
-            <span className="font-medium">Dashboard</span>
+            <Activity className="w-5 h-5" /><span className="font-medium">Dashboard</span>
           </button>
           <button onClick={() => setCurrentPage('patients')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${currentPage === 'patients' ? 'bg-gradient-to-r from-brand-blue to-brand-cyan text-white shadow-lg' : 'text-gray-400 hover:bg-dark-bg hover:text-white'}`}>
-            <Users className="w-5 h-5" />
-            <span className="font-medium">Patient Management</span>
+            <Users className="w-5 h-5" /><span className="font-medium">Patient Management</span>
           </button>
           <button onClick={() => setCurrentPage('ai-review')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${currentPage === 'ai-review' ? 'bg-gradient-to-r from-brand-blue to-brand-cyan text-white shadow-lg' : 'text-gray-400 hover:bg-dark-bg hover:text-white'}`}>
             <Stethoscope className="w-5 h-5" />
@@ -1120,25 +1082,18 @@ Date: ${new Date().toLocaleDateString()}
             )}
           </button>
           <button onClick={() => setCurrentPage('prescriptions')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${currentPage === 'prescriptions' ? 'bg-gradient-to-r from-brand-blue to-brand-cyan text-white shadow-lg' : 'text-gray-400 hover:bg-dark-bg hover:text-white'}`}>
-            <FileText className="w-5 h-5" />
-            <span className="font-medium">Prescription Management</span>
+            <FileText className="w-5 h-5" /><span className="font-medium">Prescription Management</span>
           </button>
           <button onClick={() => setLogoutModal(true)} className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-400 hover:bg-red-500/10 transition-all mt-4">
-            <LogOut className="w-5 h-5" />
-            <span className="font-medium">Logout</span>
+            <LogOut className="w-5 h-5" /><span className="font-medium">Logout</span>
           </button>
         </nav>
 
-        {/* Profile chip */}
         <div className="p-4 border-t border-dark-border">
           <div className="relative">
             <button onClick={() => setShowProfileDropdown(!showProfileDropdown)} className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-dark-bg transition-colors">
               <div className="w-10 h-10 bg-gradient-to-br from-brand-blue to-brand-cyan rounded-full flex items-center justify-center text-white font-semibold overflow-hidden flex-shrink-0">
-                {profileData.avatar ? (
-                  <img src={profileData.avatar} alt="Profile" className="w-full h-full object-cover" />
-                ) : (
-                  (profileData.name || 'D').charAt(0).toUpperCase()
-                )}
+                {profileData.avatar ? <img src={profileData.avatar} alt="Profile" className="w-full h-full object-cover" /> : (profileData.name || 'D').charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 text-left overflow-hidden">
                 <p className="text-sm font-semibold text-white truncate">{profileData.name || 'Doctor'}</p>
@@ -1150,20 +1105,16 @@ Date: ${new Date().toLocaleDateString()}
             {showProfileDropdown && (
               <div className="absolute bottom-full left-0 right-0 mb-2 bg-dark-card border border-dark-border rounded-lg shadow-xl overflow-hidden animate-fade-in-up z-10">
                 <button onClick={() => { setShowProfileDropdown(false); setCurrentPage('profile'); }} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-dark-bg transition-colors text-left">
-                  <User className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm text-white">Profile Settings</span>
+                  <User className="w-4 h-4 text-gray-400" /><span className="text-sm text-white">Profile Settings</span>
                 </button>
                 <button onClick={() => { setShowProfileDropdown(false); setShowSettingsModal(true); }} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-dark-bg transition-colors text-left">
-                  <Settings className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm text-white">Settings</span>
+                  <Settings className="w-4 h-4 text-gray-400" /><span className="text-sm text-white">Settings</span>
                 </button>
                 <button onClick={() => { setShowProfileDropdown(false); setShowHelpModal(true); }} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-dark-bg transition-colors text-left">
-                  <HelpCircle className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm text-white">Help & Support</span>
+                  <HelpCircle className="w-4 h-4 text-gray-400" /><span className="text-sm text-white">Help & Support</span>
                 </button>
                 <button onClick={() => { setShowProfileDropdown(false); setShowFeedbackModal(true); }} className="w-full flex items-center gap-3 px-4 py-3 hover:bg-dark-bg transition-colors text-left border-t border-dark-border">
-                  <MessageSquare className="w-4 h-4 text-brand-cyan" />
-                  <span className="text-sm text-white">Send Feedback</span>
+                  <MessageSquare className="w-4 h-4 text-brand-cyan" /><span className="text-sm text-white">Send Feedback</span>
                 </button>
               </div>
             )}
@@ -1171,7 +1122,6 @@ Date: ${new Date().toLocaleDateString()}
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="bg-dark-card border-b border-dark-border p-6">
           <div className="flex items-center justify-between">
@@ -1192,7 +1142,6 @@ Date: ${new Date().toLocaleDateString()}
               </p>
             </div>
             <div className="flex items-center gap-3">
-              {/* ── BELL NOTIFICATIONS ── */}
               <div ref={bellRef} style={{ position: 'relative' }}>
                 <button
                   onClick={() => {
@@ -1222,23 +1171,19 @@ Date: ${new Date().toLocaleDateString()}
                           <RefreshCw size={12} />
                         </button>
                         {bellNotifs.some(n => !n.is_read) && (
-                          <button onClick={markBellRead} style={{ fontSize: 11, color: '#0099cc', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
-                            Mark all read
-                          </button>
+                          <button onClick={markBellRead} style={{ fontSize: 11, color: '#0099cc', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>Mark all read</button>
                         )}
                       </div>
                     </div>
                     <div style={{ overflowY: 'auto', flex: 1 }}>
                       {bellLoading ? (
                         <div style={{ padding: 40, textAlign: 'center', color: '#64748b', fontSize: 13 }}>
-                          <RefreshCw size={20} style={{ animation: 'spin 1s linear infinite', margin: '0 auto 8px', display: 'block', color: '#0099cc' }} />
-                          Loading…
+                          <RefreshCw size={20} style={{ animation: 'spin 1s linear infinite', margin: '0 auto 8px', display: 'block', color: '#0099cc' }} />Loading…
                         </div>
                       ) : bellNotifs.length === 0 ? (
                         <div style={{ padding: 48, textAlign: 'center' }}>
                           <Bell size={28} style={{ margin: '0 auto 10px', display: 'block', color: '#64748b' }} />
                           <div style={{ color: '#64748b', fontSize: 13, fontWeight: 500 }}>No notifications yet</div>
-                          <div style={{ color: '#64748b', fontSize: 11, marginTop: 4 }}>You'll see alerts when patients are assigned or reports reviewed</div>
                         </div>
                       ) : (
                         bellNotifs.map((n, i) => (
@@ -1259,8 +1204,7 @@ Date: ${new Date().toLocaleDateString()}
               </div>
 
               <button onClick={() => setShowShareModal(true)} className="flex items-center gap-2 px-4 py-2 bg-dark-bg border border-dark-border text-gray-400 rounded-lg hover:border-brand-blue hover:text-white transition-colors">
-                <Share2 className="w-4 h-4" />
-                <span>Share</span>
+                <Share2 className="w-4 h-4" /><span>Share</span>
               </button>
             </div>
           </div>
@@ -1275,15 +1219,12 @@ Date: ${new Date().toLocaleDateString()}
         </main>
       </div>
 
-      {/* Patient Details Modal */}
       {showPatientModal && selectedPatient && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-dark-card border border-dark-border rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-dark-card border-b border-dark-border p-6 flex items-center justify-between">
               <h3 className="text-2xl font-bold text-white">Patient Details</h3>
-              <button onClick={() => setShowPatientModal(false)} className="p-2 hover:bg-dark-bg rounded-lg transition-colors">
-                <X className="w-5 h-5 text-gray-400" />
-              </button>
+              <button onClick={() => setShowPatientModal(false)} className="p-2 hover:bg-dark-bg rounded-lg transition-colors"><X className="w-5 h-5 text-gray-400" /></button>
             </div>
             <div className="p-6 space-y-6">
               <div className="grid grid-cols-2 gap-6">
@@ -1295,56 +1236,28 @@ Date: ${new Date().toLocaleDateString()}
                 <div><label className="text-sm text-gray-400 mb-1 block">Phone</label><p className="text-white">{selectedPatient.phone || '—'}</p></div>
                 <div><label className="text-sm text-gray-400 mb-1 block">Blood Group</label><p className="text-white">{selectedPatient.blood_group || '—'}</p></div>
                 <div><label className="text-sm text-gray-400 mb-1 block">BMI</label><p className="text-white">{selectedPatient.bmi ?? '—'}</p></div>
-                <div><label className="text-sm text-gray-400 mb-1 block">Total AI Reports</label><p className="text-white">{selectedPatient.total_reports ?? '—'}</p></div>
-                <div><label className="text-sm text-gray-400 mb-1 block">Last Visit</label><p className="text-white">{selectedPatient.last_visit || '—'}</p></div>
-              </div>
-              <div className="bg-dark-bg border border-dark-border rounded-lg p-4">
-                <h4 className="text-lg font-semibold text-white mb-4">Latest Condition</h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div><label className="text-xs text-gray-400">Disease</label><p className="text-white font-semibold">{selectedPatient.last_disease || '—'}</p></div>
-                  <div><label className="text-xs text-gray-400">Subscription</label><p className="text-white font-semibold">{selectedPatient.subscription || '—'}</p></div>
-                  <div><label className="text-xs text-gray-400">Height</label><p className="text-white font-semibold">{selectedPatient.height_cm ? `${selectedPatient.height_cm} cm` : '—'}</p></div>
-                  <div><label className="text-xs text-gray-400">Weight</label><p className="text-white font-semibold">{selectedPatient.weight_kg ? `${selectedPatient.weight_kg} kg` : '—'}</p></div>
-                </div>
               </div>
               <div className="flex gap-3">
-                <button onClick={() => { handleGeneratePrescription(selectedPatient); setShowPatientModal(false); }} className="flex-1 px-6 py-3 bg-gradient-to-r from-brand-blue to-brand-cyan text-white rounded-lg font-semibold hover:shadow-lg transition-all">
-                  Generate Prescription
-                </button>
-                <button onClick={() => setShowPatientModal(false)} className="px-6 py-3 bg-dark-bg border border-dark-border text-white rounded-lg hover:border-brand-blue transition-colors">
-                  Close
-                </button>
+                <button onClick={() => { handleGeneratePrescription(selectedPatient); setShowPatientModal(false); }} className="flex-1 px-6 py-3 bg-gradient-to-r from-brand-blue to-brand-cyan text-white rounded-lg font-semibold hover:shadow-lg transition-all">Generate Prescription</button>
+                <button onClick={() => setShowPatientModal(false)} className="px-6 py-3 bg-dark-bg border border-dark-border text-white rounded-lg hover:border-brand-blue transition-colors">Close</button>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* AI Review Modal */}
       {showReviewModal && selectedPatient && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-dark-card border border-dark-border rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-dark-card border-b border-dark-border p-6 flex items-center justify-between">
               <h3 className="text-2xl font-bold text-white">AI Treatment Review</h3>
-              <button onClick={() => { setShowReviewModal(false); setReviewMode(null); }} className="p-2 hover:bg-dark-bg rounded-lg transition-colors">
-                <X className="w-5 h-5 text-gray-400" />
-              </button>
+              <button onClick={() => { setShowReviewModal(false); setReviewMode(null); }} className="p-2 hover:bg-dark-bg rounded-lg transition-colors"><X className="w-5 h-5 text-gray-400" /></button>
             </div>
             <div className="p-6 space-y-6">
               <div className="grid grid-cols-3 gap-4 bg-dark-bg border border-dark-border rounded-lg p-4">
                 <div><label className="text-xs text-gray-400">Patient</label><p className="text-white font-semibold">{selectedPatient.patient_name || selectedPatient.name}</p></div>
                 <div><label className="text-xs text-gray-400">Age</label><p className="text-white font-semibold">{selectedPatient.patient_age || selectedPatient.age || '—'}</p></div>
-                <div><label className="text-xs text-gray-400">Date</label><p className="text-white font-semibold">{selectedPatient.aiReport?.date ? new Date(selectedPatient.aiReport.date).toLocaleDateString() : '—'}</p></div>
-                <div><label className="text-xs text-gray-400">Blood Pressure</label><p className="text-white font-semibold">{selectedPatient.aiReport?.blood_pressure || '—'}</p></div>
-                <div><label className="text-xs text-gray-400">Temperature</label><p className="text-white font-semibold">{selectedPatient.aiReport?.temperature ? `${selectedPatient.aiReport.temperature}°C` : '—'}</p></div>
                 <div><label className="text-xs text-gray-400">Confidence</label><p className="text-white font-semibold">{modifiedReport.confidence}</p></div>
-              </div>
-
-              <div className="p-4 rounded-lg border bg-green-500/10 border-green-500/30">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-green-400" />
-                  <span className="text-green-400 font-semibold">Patient has submitted this AI report for doctor review</span>
-                </div>
               </div>
 
               {Array.isArray(modifiedReport.symptoms) && modifiedReport.symptoms.length > 0 && (
@@ -1359,9 +1272,7 @@ Date: ${new Date().toLocaleDateString()}
               )}
 
               <div className="bg-dark-bg border border-dark-border rounded-lg p-4">
-                <h4 className="text-lg font-semibold text-white mb-4">
-                  AI Prediction: {reviewMode === 'modify' ? '' : modifiedReport.disease}
-                </h4>
+                <h4 className="text-lg font-semibold text-white mb-4">AI Prediction</h4>
                 {reviewMode === 'modify' ? (
                   <div className="space-y-3">
                     <div>
@@ -1369,7 +1280,7 @@ Date: ${new Date().toLocaleDateString()}
                       <input type="text" value={modifiedReport.disease} onChange={(e) => setModifiedReport(prev => ({ ...prev, disease: e.target.value }))} className="w-full px-4 py-2 bg-dark-card border border-dark-border rounded-lg text-white focus:border-brand-blue focus:outline-none" />
                     </div>
                     <div>
-                      <label className="text-sm text-gray-400 mb-1 block">Treatment / Recommendation</label>
+                      <label className="text-sm text-gray-400 mb-1 block">Treatment</label>
                       <textarea value={modifiedReport.treatment} onChange={(e) => setModifiedReport(prev => ({ ...prev, treatment: e.target.value }))} rows={3} className="w-full px-4 py-2 bg-dark-card border border-dark-border rounded-lg text-white focus:border-brand-blue focus:outline-none resize-none" />
                     </div>
                   </div>
@@ -1386,15 +1297,15 @@ Date: ${new Date().toLocaleDateString()}
                   <h4 className="text-sm font-semibold text-gray-400 uppercase">Prescription Details</h4>
                   <div>
                     <label className="text-sm text-gray-400 mb-1 block">Medicine Details</label>
-                    <textarea value={rxForm.medicines} onChange={(e) => setRxForm(p => ({ ...p, medicines: e.target.value }))} rows={2} placeholder="e.g. Paracetamol 500mg, Amoxicillin 250mg..." className="w-full px-4 py-2 bg-dark-card border border-dark-border rounded-lg text-white focus:border-brand-blue focus:outline-none resize-none" />
+                    <textarea value={rxForm.medicines} onChange={(e) => setRxForm(p => ({ ...p, medicines: e.target.value }))} rows={2} placeholder="e.g. Paracetamol 500mg..." className="w-full px-4 py-2 bg-dark-card border border-dark-border rounded-lg text-white focus:border-brand-blue focus:outline-none resize-none" />
                   </div>
                   <div>
                     <label className="text-sm text-gray-400 mb-1 block">Dosage Instructions</label>
-                    <input type="text" value={rxForm.dosage} onChange={(e) => setRxForm(p => ({ ...p, dosage: e.target.value }))} placeholder="e.g. Twice daily for 5 days" className="w-full px-4 py-2 bg-dark-card border border-dark-border rounded-lg text-white focus:border-brand-blue focus:outline-none" />
+                    <input type="text" value={rxForm.dosage} onChange={(e) => setRxForm(p => ({ ...p, dosage: e.target.value }))} className="w-full px-4 py-2 bg-dark-card border border-dark-border rounded-lg text-white focus:border-brand-blue focus:outline-none" />
                   </div>
                   <div>
                     <label className="text-sm text-gray-400 mb-1 block">Notes</label>
-                    <textarea value={rxForm.notes} onChange={(e) => setRxForm(p => ({ ...p, notes: e.target.value }))} rows={2} placeholder="Additional notes for patient..." className="w-full px-4 py-2 bg-dark-card border border-dark-border rounded-lg text-white focus:border-brand-blue focus:outline-none resize-none" />
+                    <textarea value={rxForm.notes} onChange={(e) => setRxForm(p => ({ ...p, notes: e.target.value }))} rows={2} className="w-full px-4 py-2 bg-dark-card border border-dark-border rounded-lg text-white focus:border-brand-blue focus:outline-none resize-none" />
                   </div>
                 </div>
               )}
@@ -1406,30 +1317,24 @@ Date: ${new Date().toLocaleDateString()}
               <div className="flex gap-3">
                 {reviewMode === 'modify' ? (
                   <>
-                    <button onClick={handleSaveModifications} disabled={loading} className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50">
-                      {loading ? 'Saving...' : 'Save & Approve'}
-                    </button>
+                    <button onClick={handleSaveModifications} disabled={loading} className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg font-semibold disabled:opacity-50">{loading ? 'Saving...' : 'Save & Approve'}</button>
                     <button onClick={() => setReviewMode(null)} className="px-6 py-3 bg-dark-bg border border-dark-border text-white rounded-lg">Cancel</button>
                   </>
                 ) : reviewMode === 'reject' ? (
                   <>
-                    <button onClick={handleRejectReport} disabled={loading} className="flex-1 px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg font-semibold hover:shadow-lg disabled:opacity-50">
-                      {loading ? 'Rejecting...' : 'Confirm Rejection'}
-                    </button>
+                    <button onClick={handleRejectReport} disabled={loading} className="flex-1 px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg font-semibold disabled:opacity-50">{loading ? 'Rejecting...' : 'Confirm Rejection'}</button>
                     <button onClick={() => setReviewMode(null)} className="px-6 py-3 bg-dark-bg border border-dark-border text-white rounded-lg">Cancel</button>
                   </>
                 ) : reviewMode === 'approve' ? (
                   <>
-                    <button onClick={handleApproveReport} disabled={loading} className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg font-semibold hover:shadow-lg disabled:opacity-50">
-                      {loading ? 'Approving...' : 'Confirm Approval'}
-                    </button>
+                    <button onClick={handleApproveReport} disabled={loading} className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg font-semibold disabled:opacity-50">{loading ? 'Approving...' : 'Confirm Approval'}</button>
                     <button onClick={() => setReviewMode(null)} className="px-6 py-3 bg-dark-bg border border-dark-border text-white rounded-lg">Cancel</button>
                   </>
                 ) : (
                   <>
-                    <button onClick={() => setReviewMode('approve')} disabled={loading} className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg font-semibold hover:shadow-lg disabled:opacity-50">Approve</button>
-                    <button onClick={handleModifyReport} className="flex-1 px-6 py-3 bg-gradient-to-r from-brand-blue to-brand-cyan text-white rounded-lg font-semibold hover:shadow-lg">Modify</button>
-                    <button onClick={() => setReviewMode('reject')} className="flex-1 px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg font-semibold hover:shadow-lg">Reject</button>
+                    <button onClick={() => setReviewMode('approve')} className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg font-semibold">Approve</button>
+                    <button onClick={handleModifyReport} className="flex-1 px-6 py-3 bg-gradient-to-r from-brand-blue to-brand-cyan text-white rounded-lg font-semibold">Modify</button>
+                    <button onClick={() => setReviewMode('reject')} className="flex-1 px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg font-semibold">Reject</button>
                   </>
                 )}
               </div>
@@ -1438,15 +1343,12 @@ Date: ${new Date().toLocaleDateString()}
         </div>
       )}
 
-      {/* Prescription Modal */}
       {showPrescriptionModal && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-dark-card border border-dark-border rounded-xl max-w-2xl w-full">
             <div className="border-b border-dark-border p-6 flex items-center justify-between">
               <h3 className="text-2xl font-bold text-white">Create Prescription</h3>
-              <button onClick={() => setShowPrescriptionModal(false)} className="p-2 hover:bg-dark-bg rounded-lg transition-colors">
-                <X className="w-5 h-5 text-gray-400" />
-              </button>
+              <button onClick={() => setShowPrescriptionModal(false)} className="p-2 hover:bg-dark-bg rounded-lg transition-colors"><X className="w-5 h-5 text-gray-400" /></button>
             </div>
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -1457,8 +1359,8 @@ Date: ${new Date().toLocaleDateString()}
               <div><label className="text-sm text-gray-400 mb-2 block">Medicines</label><textarea value={prescription.medicines} onChange={(e) => setPrescription({ ...prescription, medicines: e.target.value })} className="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg text-white focus:border-brand-blue focus:outline-none resize-none" rows="3" /></div>
               <div><label className="text-sm text-gray-400 mb-2 block">Instructions</label><textarea value={prescription.instructions} onChange={(e) => setPrescription({ ...prescription, instructions: e.target.value })} className="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg text-white focus:border-brand-blue focus:outline-none resize-none" rows="2" /></div>
               <div className="flex gap-3 pt-4">
-                <button onClick={handleDownloadPrescription} disabled={loading} className="flex-1 px-6 py-3 bg-gradient-to-r from-brand-blue to-brand-cyan text-white rounded-lg font-semibold hover:shadow-lg flex items-center justify-center gap-2 disabled:opacity-50">
-                  {loading ? <><RefreshCw className="w-5 h-5 animate-spin" />Generating...</> : <><Download className="w-5 h-5" />Download PDF</>}
+                <button onClick={handleDownloadPrescription} disabled={loading} className="flex-1 px-6 py-3 bg-gradient-to-r from-brand-blue to-brand-cyan text-white rounded-lg font-semibold flex items-center justify-center gap-2 disabled:opacity-50">
+                  {loading ? <><RefreshCw className="w-5 h-5 animate-spin" />Generating...</> : <><Download className="w-5 h-5" />Download</>}
                 </button>
                 <button onClick={() => setShowPrescriptionModal(false)} className="px-6 py-3 bg-dark-bg border border-dark-border text-white rounded-lg hover:border-brand-blue transition-colors">Cancel</button>
               </div>
@@ -1467,7 +1369,6 @@ Date: ${new Date().toLocaleDateString()}
         </div>
       )}
 
-      {/* Settings Modal */}
       {showSettingsModal && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-dark-card border border-dark-border rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -1488,66 +1389,59 @@ Date: ${new Date().toLocaleDateString()}
                 </div>
               </div>
               <div className="flex gap-3 pt-4">
-                <button onClick={handleSaveSettings} disabled={loading} className="flex-1 px-6 py-3 bg-gradient-to-r from-brand-blue to-brand-cyan text-white rounded-lg font-semibold hover:shadow-lg disabled:opacity-50">{loading ? 'Saving...' : 'Save Settings'}</button>
-                <button onClick={() => setShowSettingsModal(false)} className="px-6 py-3 bg-dark-bg border border-dark-border text-white rounded-lg hover:border-brand-blue transition-colors">Cancel</button>
+                <button onClick={handleSaveSettings} className="flex-1 px-6 py-3 bg-gradient-to-r from-brand-blue to-brand-cyan text-white rounded-lg font-semibold">Save Settings</button>
+                <button onClick={() => setShowSettingsModal(false)} className="px-6 py-3 bg-dark-bg border border-dark-border text-white rounded-lg">Cancel</button>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Help Modal */}
       {showHelpModal && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-dark-card border border-dark-border rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-dark-card border border-dark-border rounded-xl max-w-2xl w-full">
             <div className="sticky top-0 bg-dark-card border-b border-dark-border p-6 flex items-center justify-between">
               <h3 className="text-2xl font-bold text-white">Help & Support</h3>
-              <button onClick={() => setShowHelpModal(false)} className="p-2 hover:bg-dark-bg rounded-lg transition-colors"><X className="w-5 h-5 text-gray-400" /></button>
+              <button onClick={() => setShowHelpModal(false)} className="p-2 hover:bg-dark-bg rounded-lg"><X className="w-5 h-5 text-gray-400" /></button>
             </div>
-            <div className="p-6 space-y-6">
+            <div className="p-6 space-y-4">
               <div className="bg-dark-bg border border-dark-border rounded-lg p-4">
                 <h5 className="text-white font-semibold mb-2">How to review AI reports?</h5>
                 <p className="text-gray-400 text-sm">Navigate to AI Treatment Review, click Review Report, and choose Approve, Modify, or Reject.</p>
               </div>
               <div className="bg-dark-bg border border-dark-border rounded-lg p-4 space-y-2">
                 <p className="text-white"><strong>Email:</strong> support@mediai.com</p>
-                <p className="text-white"><strong>Phone:</strong> +1 800-MEDIAI-1</p>
               </div>
-              <button onClick={() => setShowHelpModal(false)} className="w-full px-6 py-3 bg-gradient-to-r from-brand-blue to-brand-cyan text-white rounded-lg font-semibold hover:shadow-lg">Got it!</button>
+              <button onClick={() => setShowHelpModal(false)} className="w-full px-6 py-3 bg-gradient-to-r from-brand-blue to-brand-cyan text-white rounded-lg font-semibold">Got it!</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Share Modal */}
       {showShareModal && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-dark-card border border-dark-border rounded-xl max-w-md w-full">
             <div className="border-b border-dark-border p-6 flex items-center justify-between">
               <h3 className="text-2xl font-bold text-white">Share</h3>
-              <button onClick={() => setShowShareModal(false)} className="p-2 hover:bg-dark-bg rounded-lg transition-colors"><X className="w-5 h-5 text-gray-400" /></button>
+              <button onClick={() => setShowShareModal(false)} className="p-2 hover:bg-dark-bg rounded-lg"><X className="w-5 h-5 text-gray-400" /></button>
             </div>
             <div className="p-6 space-y-4">
-              <button onClick={() => handleShare('copy')} className="w-full flex items-center gap-3 p-4 bg-dark-bg border border-dark-border rounded-lg hover:border-brand-blue transition-colors text-left">
-                <Copy className="w-5 h-5 text-brand-blue" /><div><p className="text-white font-semibold">Copy Link</p></div>
+              <button onClick={() => handleShare('copy')} className="w-full flex items-center gap-3 p-4 bg-dark-bg border border-dark-border rounded-lg hover:border-brand-blue transition-colors">
+                <Copy className="w-5 h-5 text-brand-blue" /><p className="text-white font-semibold">Copy Link</p>
               </button>
-              <button onClick={() => handleShare('email')} className="w-full flex items-center gap-3 p-4 bg-dark-bg border border-dark-border rounded-lg hover:border-brand-blue transition-colors text-left">
-                <Mail className="w-5 h-5 text-red-400" /><div><p className="text-white font-semibold">Email</p></div>
+              <button onClick={() => handleShare('email')} className="w-full flex items-center gap-3 p-4 bg-dark-bg border border-dark-border rounded-lg hover:border-brand-blue transition-colors">
+                <Mail className="w-5 h-5 text-red-400" /><p className="text-white font-semibold">Email</p>
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Feedback Modal - Using DoctorFeedbackForm Component */}
       {showFeedbackModal && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="w-full max-w-md">
             <div className="relative">
-              <button
-                onClick={() => setShowFeedbackModal(false)}
-                className="absolute -top-10 right-0 p-2 hover:bg-dark-bg rounded-lg transition-colors z-10"
-              >
+              <button onClick={() => setShowFeedbackModal(false)} className="absolute -top-10 right-0 p-2 hover:bg-dark-bg rounded-lg transition-colors z-10">
                 <X className="w-5 h-5 text-gray-400" />
               </button>
               <DoctorFeedbackForm token={localStorage.getItem('token')} />
@@ -1556,18 +1450,17 @@ Date: ${new Date().toLocaleDateString()}
         </div>
       )}
 
-      {/* Logout Modal */}
       {logoutModal && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-dark-card border border-dark-border rounded-xl max-w-sm w-full">
             <div className="border-b border-dark-border p-6 flex items-center justify-between">
               <h3 className="text-xl font-bold text-white">Confirm Logout</h3>
-              <button onClick={() => setLogoutModal(false)} className="p-2 hover:bg-dark-bg rounded-lg transition-colors"><X className="w-5 h-5 text-gray-400" /></button>
+              <button onClick={() => setLogoutModal(false)} className="p-2 hover:bg-dark-bg rounded-lg"><X className="w-5 h-5 text-gray-400" /></button>
             </div>
             <div className="p-6">
-              <p className="text-gray-400 text-sm mb-6">Are you sure you want to logout from your account?</p>
+              <p className="text-gray-400 text-sm mb-6">Are you sure you want to logout?</p>
               <div className="flex gap-3">
-                <button onClick={logout} className="flex-1 px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold transition-colors">Yes, Logout</button>
+                <button onClick={logout} className="flex-1 px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold">Yes, Logout</button>
                 <button onClick={() => setLogoutModal(false)} className="flex-1 px-4 py-2.5 bg-dark-bg border border-dark-border text-white rounded-lg hover:border-brand-blue transition-colors">Cancel</button>
               </div>
             </div>
